@@ -1,0 +1,136 @@
+.main-map-container {
+  --x-size: 10;
+
+  background-color: yellow;
+  display: flex;
+  justify-content: flex-start;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  min-width: 100%; width: 100%; max-width: 100%;
+
+  .grid-cell {
+    --cell-size: calc(100svw / var(--x-size));
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    aspect-ratio: 1/1;
+    background-color: hsl(200, 80%, 50%);
+    min-width: var(--cell-size); width: var(--cell-size); max-width: var(--cell-size);
+    min-height: var(--cell-size); height: var(--cell-size); max-height: var(--cell-size);
+    font-size: 12px;
+    color: transparent;
+    /* border: 1px solid black; */
+
+    &.island-center {
+      /* background-color: hsl(111, 21%, 30%); */
+      background-color: hsl(111, 21%, 36%);
+
+      &.spreaded {
+        border: none;
+        background-color: hsl(111, 21%, 36%);
+      }
+    }
+
+    &.surrounding {
+      background-color: hsl(80, 17%, 56%);
+    }
+
+    &.beach {
+      background-color: hsl(39, 50%, 90%);
+    }
+
+    &.water-1 {
+      background-color: hsl(175, 70%, 70%);
+    }
+
+    &.water-2 {
+      background-color: hsl(190, 80%, 50%);
+    }
+
+    /* &.central-point {
+      border: none;
+      background-color: red !important;
+    } */
+  }
+
+}
+
+.lines-container {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+
+  .line {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--color--fg-default);
+
+    &:first-child {
+      padding-top: 0;
+    }
+    &:last-child {
+      padding-bottom: 0;
+      border-bottom: 0;
+    }
+  
+    > span {
+      width: 64px;
+      font-weight: 600;
+    }
+  
+    .block {
+      display: flex;
+      justify-content: flex-end;
+      align-items: flex-start;
+      width: 136px;
+      gap: 8px;
+  
+      .block-line {
+        display: flex;
+        justify-content: space-between;
+        gap: 4px;
+        min-width: 80px; width: 80px; max-width: 80px;
+        font-weight: 600;
+
+        &.spread {
+          min-width: 72px; width: 72px; max-width: 72px;
+        }
+      }
+    }
+  }
+}
+
+.line-2 {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  gap: 8px;
+        font-weight: 600;
+
+  .block {
+    display: flex;
+    justify-content: flex-end;
+    align-items: flex-start;
+    width: 136px;
+      gap: 8px;
+
+    .block-line {
+      display: flex;
+        justify-content: space-between;
+        gap: 4px;
+        width: 86px;
+        font-weight: 600;
+    }
+  }
+}
+
+
+.lzr-footer {
+  .lzr-button {
+    width: 100%;
+  }
+}
