@@ -108,29 +108,44 @@ const PRESETS = [
     islandCount: 3,
     centerSpread: 36,
     centerSpreadProbability: 22,
-    surroundingsSpread: 8,
-    surroundingsSpreadProbability: 14,
+    surroundingsSpread: 6,
+    surroundingsSpreadProbability: 12,
     beachSpread: 1,
-    beachSpreadProbability: 24,
-    water1Spread: 4,
-    water1SpreadProbability: 18,
-    water2Spread: 12,
-    water2SpreadProbability: 14,
+    beachSpreadProbability: 16,
+    water1Spread: 2,
+    water1SpreadProbability: 6,
+    water2Spread: 8,
+    water2SpreadProbability: 12,
   },
   {
     id: 'coral-hell',
     name: 'Coral hell',
-    islandCount: 24,
-    centerSpread: 12,
+    islandCount: 16,
+    centerSpread: 8,
     centerSpreadProbability: 2,
-    surroundingsSpread: 8,
-    surroundingsSpreadProbability: 5,
-    beachSpread: 3,
-    beachSpreadProbability: 6,
-    water1Spread: 8,
+    surroundingsSpread: 6,
+    surroundingsSpreadProbability: 3,
+    beachSpread: 4,
+    beachSpreadProbability: 8,
+    water1Spread: 4,
+    water1SpreadProbability: 8,
+    water2Spread: 12,
+    water2SpreadProbability: 8,
+  },
+  {
+    id: 'mangrove',
+    name: 'Mangrove delta',
+    islandCount: 24,
+    centerSpread: 2,
+    centerSpreadProbability: 2,
+    surroundingsSpread: 12,
+    surroundingsSpreadProbability: 12,
+    beachSpread: 4,
+    beachSpreadProbability: 10,
+    water1Spread: 6,
     water1SpreadProbability: 6,
-    water2Spread: 13,
-    water2SpreadProbability: 10,
+    water2Spread: 12,
+    water2SpreadProbability: 14,
   },
 ];
 
@@ -334,6 +349,7 @@ function onSelectChange(event) {
   document.getElementsByClassName('lzr')[0].style = `
     --map-theme: '${preset.id}';
   ';`;
+  onGenerateClick();
 }
 window.onSelectChange = onSelectChange;
 
