@@ -21,7 +21,139 @@ let MAIN_WIDTH = MAIN.getBoundingClientRect().width;
 const X_SIZE = 64;//Math.round(MAIN_WIDTH / 6);
 const Y_SIZE = 86;//Math.round(MAIN_WIDTH / 4.5);
 
-let islandCount = 12;
+const PRESETS = [
+  // DEFAULT
+  {
+    id: 'default',
+    name: 'Default',
+    islandCount: 12,
+    centerSpread: 16,
+    centerSpreadProbability: 16,
+    surroundingsSpread: 4,
+    surroundingsSpreadProbability: 8,
+    beachSpread: 2,
+    beachSpreadProbability: 8,
+    water1Spread: 2,
+    water1SpreadProbability: 16,
+    water2Spread: 6,
+    water2SpreadProbability: 16,
+  },
+  // archipel réaliste
+  {
+    id: 'realistic',
+    name: 'Realistic',
+    islandCount: 6,
+    centerSpread: 26,
+    centerSpreadProbability: 19,
+    surroundingsSpread: 6,
+    surroundingsSpreadProbability: 12,
+    beachSpread: 1,
+    beachSpreadProbability: 28,
+    water1Spread: 5,
+    water1SpreadProbability: 20,
+    water2Spread: 10,
+    water2SpreadProbability: 11,
+  },
+  // tropical islands
+  {
+    id: 'tropical',
+    name: 'Tropical islands',
+    islandCount: 14,
+    centerSpread: 14,
+    centerSpreadProbability: 17,
+    surroundingsSpread: 3,
+    surroundingsSpreadProbability: 10,
+    beachSpread: 2,
+    beachSpreadProbability: 40,
+    water1Spread: 6,
+    water1SpreadProbability: 25,
+    water2Spread: 10,
+    water2SpreadProbability: 18,
+  },
+  // volcanic islands
+  {
+    id: 'volcanic',
+    name: 'Volcanic islands',
+    islandCount: 4,
+    centerSpread: 30,
+    centerSpreadProbability: 20,
+    surroundingsSpread: 4,
+    surroundingsSpreadProbability: 10,
+    beachSpread: 1,
+    beachSpreadProbability: 25,
+    water1Spread: 3,
+    water1SpreadProbability: 20,
+    water2Spread: 10,
+    water2SpreadProbability: 14,
+  },
+  // fjord islands
+  {
+    id: 'fjord',
+    name: 'Fjords',
+    islandCount: 6,
+    centerSpread: 26,
+    centerSpreadProbability: 14,
+    surroundingsSpread: 7,
+    surroundingsSpreadProbability: 10,
+    beachSpread: 1,
+    beachSpreadProbability: 20,
+    water1Spread: 6,
+    water1SpreadProbability: 30,
+    water2Spread: 12,
+    water2SpreadProbability: 15,
+  },
+  {
+    id: 'continent',
+    name: 'Continent',
+    islandCount: 3,
+    centerSpread: 36,
+    centerSpreadProbability: 22,
+    surroundingsSpread: 8,
+    surroundingsSpreadProbability: 14,
+    beachSpread: 1,
+    beachSpreadProbability: 24,
+    water1Spread: 4,
+    water1SpreadProbability: 18,
+    water2Spread: 12,
+    water2SpreadProbability: 14,
+  },
+  {
+    id: 'coral-hell',
+    name: 'Coral hell',
+    islandCount: 24,
+    centerSpread: 12,
+    centerSpreadProbability: 2,
+    surroundingsSpread: 8,
+    surroundingsSpreadProbability: 5,
+    beachSpread: 3,
+    beachSpreadProbability: 6,
+    water1Spread: 8,
+    water1SpreadProbability: 6,
+    water2Spread: 13,
+    water2SpreadProbability: 10,
+  },
+];
+
+let CURRENT_PRESET = {
+  islandCount: 12,
+
+  centerSpread: 16,
+  centerSpreadProbability: 16,
+
+  surroundingsSpread: 4,
+  surroundingsSpreadProbability: 8,
+
+  beachSpread: 2,
+  beachSpreadProbability: 8,
+
+  water1Spread: 2,
+  water1SpreadProbability: 16,
+
+  water2Spread: 6,
+  water2SpreadProbability: 16,
+};
+
+/* let islandCount = 12;
 
 let centerSpread = Math.round(X_SIZE / 10 * 2.5);
 let centerSpreadProbability = 16;
@@ -36,7 +168,7 @@ let water1Spread = Math.round(X_SIZE / 30);
 let water1SpreadProbability = 16;
 
 let water2Spread = Math.round(X_SIZE / 10);
-let water2SpreadProbability = 16;
+let water2SpreadProbability = 16; */
 
 // FUNCTIONS //////////////////////////////////////////////////////////////////////////////////////
 
@@ -65,12 +197,12 @@ export function render() {
   FOOTER.style.setProperty('--height--footer', `calc(100svh - ${mapHeight}px)`);
   FOOTER.innerHTML = `
   <div class="line-2">
-    <span>Central points</span>
+    ${getPresetSelectDom()}
     <div class="block">
       <span>Count</span>
       <div class="block-line">
         <button onclick="onMinusClick('island', 'count')">-</button>
-        <span id="islandCount">${islandCount}</span>
+        <span id="islandCount">${CURRENT_PRESET.islandCount}</span>
         <button onclick="onPlusClick('island', 'count')">+</button>
       </div>
     </div>
@@ -79,12 +211,12 @@ export function render() {
   <div class="lines-container">
 
     <div class="line">
-      <span>Forest</span>
+      <span>Core</span>
       <div class="block">
         <span>Spread</span>
         <div class="block-line spread">
           <button onclick="onMinusClick('center', 'spread')">-</button>
-          <span id="centerSpread">${centerSpread}</span>
+          <span id="centerSpread">${CURRENT_PRESET.centerSpread}</span>
           <button onclick="onPlusClick('center', 'spread')">+</button>
         </div>
       </div>
@@ -92,18 +224,18 @@ export function render() {
         <span>Proba</span>
         <div class="block-line">
           <button onclick="onMinusClick('center', 'proba')">-</button>
-          <span id="centerSpreadProbability">${centerSpreadProbability}%</span>
+          <span id="centerSpreadProbability">${CURRENT_PRESET.centerSpreadProbability}%</span>
           <button onclick="onPlusClick('center', 'proba')">+</button>
         </div>
       </div>
     </div>
     <div class="line">
-      <span>Grass</span>
+      <span>Land</span>
       <div class="block">
         <span>Spread</span>
         <div class="block-line spread">
           <button onclick="onMinusClick('surroundings', 'spread')">-</button>
-          <span id="surroundingsSpread">${surroundingsSpread}</span>
+          <span id="surroundingsSpread">${CURRENT_PRESET.surroundingsSpread}</span>
           <button onclick="onPlusClick('surroundings', 'spread')">+</button>
         </div>
       </div>
@@ -111,7 +243,7 @@ export function render() {
         <span>Proba</span>
         <div class="block-line">
           <button onclick="onMinusClick('surroundings', 'proba')">-</button>
-          <span id="surroundingsSpreadProbability">${surroundingsSpreadProbability}%</span>
+          <span id="surroundingsSpreadProbability">${CURRENT_PRESET.surroundingsSpreadProbability}%</span>
           <button onclick="onPlusClick('surroundings', 'proba')">+</button>
         </div>
       </div>
@@ -122,7 +254,7 @@ export function render() {
         <span>Spread</span>
         <div class="block-line spread">
           <button onclick="onMinusClick('beach', 'spread')">-</button>
-          <span id="beachSpread">${beachSpread}</span>
+          <span id="beachSpread">${CURRENT_PRESET.beachSpread}</span>
           <button onclick="onPlusClick('beach', 'spread')">+</button>
         </div>
       </div>
@@ -130,7 +262,7 @@ export function render() {
         <span>Proba</span>
         <div class="block-line">
           <button onclick="onMinusClick('beach', 'proba')">-</button>
-          <span id="beachSpreadProbability">${beachSpreadProbability}%</span>
+          <span id="beachSpreadProbability">${CURRENT_PRESET.beachSpreadProbability}%</span>
           <button onclick="onPlusClick('beach', 'proba')">+</button>
         </div>
       </div>
@@ -141,7 +273,7 @@ export function render() {
         <span>Spread</span>
         <div class="block-line spread">
           <button onclick="onMinusClick('water1', 'spread')">-</button>
-          <span id="water1Spread">${water1Spread}</span>
+          <span id="water1Spread">${CURRENT_PRESET.water1Spread}</span>
           <button onclick="onPlusClick('water1', 'spread')">+</button>
         </div>
       </div>
@@ -149,7 +281,7 @@ export function render() {
         <span>Proba</span>
         <div class="block-line">
           <button onclick="onMinusClick('water1', 'proba')">-</button>
-          <span id="water1SpreadProbability">${water1SpreadProbability}%</span>
+          <span id="water1SpreadProbability">${CURRENT_PRESET.water1SpreadProbability}%</span>
           <button onclick="onPlusClick('water1', 'proba')">+</button>
         </div>
       </div>
@@ -160,7 +292,7 @@ export function render() {
         <span>Spread</span>
         <div class="block-line spread">
           <button onclick="onMinusClick('water2', 'spread')">-</button>
-          <span id="water2Spread">${water2Spread}</span>
+          <span id="water2Spread">${CURRENT_PRESET.water2Spread}</span>
           <button onclick="onPlusClick('water2', 'spread')">+</button>
         </div>
       </div>
@@ -168,7 +300,7 @@ export function render() {
         <span>Proba</span>
         <div class="block-line">
           <button onclick="onMinusClick('water2', 'proba')">-</button>
-          <span id="water2SpreadProbability">${water2SpreadProbability}%</span>
+          <span id="water2SpreadProbability">${CURRENT_PRESET.water2SpreadProbability}%</span>
           <button onclick="onPlusClick('water2', 'proba')">+</button>
         </div>
       </div>
@@ -180,34 +312,78 @@ export function render() {
   
 }
 
+function getPresetSelectDom() {
+  let str = `
+    <select id="select" class="lzr-select lzr-outlined" onchange="onSelectChange(event)">
+      <button id=custombutton>
+        <selectedcontent></selectedcontent>
+      </button>
+  `;
+  for (let preset of PRESETS) {
+    str += `<option value="${preset.id}">${preset.name}</option>`;
+  }
+  str += '</select>';
+  return str;
+}
+
+function onSelectChange(event) {
+  console.log(event.target.value);
+  let preset = PRESETS.find((e) => e.id == event.target.value);
+  CURRENT_PRESET = {...preset};
+  updateValues();
+  document.getElementsByClassName('lzr')[0].style = `
+    --map-theme: '${preset.id}';
+  ';`;
+}
+window.onSelectChange = onSelectChange;
+
+function updateValues() {
+  document.getElementById('centerSpread').innerHTML = CURRENT_PRESET.centerSpread;
+  document.getElementById('surroundingsSpread').innerHTML = CURRENT_PRESET.surroundingsSpread; 
+  document.getElementById('beachSpread').innerHTML = CURRENT_PRESET.beachSpread; 
+  document.getElementById('water1Spread').innerHTML = CURRENT_PRESET.water1Spread; 
+  document.getElementById('water2Spread').innerHTML = CURRENT_PRESET.water2Spread; 
+
+  document.getElementById('centerSpreadProbability').innerHTML = `${CURRENT_PRESET.centerSpreadProbability}%`; 
+  document.getElementById('surroundingsSpreadProbability').innerHTML = `${CURRENT_PRESET.surroundingsSpreadProbability}%`; 
+  document.getElementById('beachSpreadProbability').innerHTML = `${CURRENT_PRESET.beachSpreadProbability}%`; 
+  document.getElementById('water1SpreadProbability').innerHTML = `${CURRENT_PRESET.water1SpreadProbability}%`; 
+  document.getElementById('water2SpreadProbability').innerHTML = `${CURRENT_PRESET.water2SpreadProbability}%`; 
+
+  document.getElementById('islandCount').innerHTML = CURRENT_PRESET.islandCount;
+}
+
 function onMinusClick(categ, type) {
   switch (type) {
     case 'spread':
       switch (categ) {
-        case 'center': if (centerSpread > 1) centerSpread -= 1; document.getElementById('centerSpread').innerHTML = centerSpread; break;
-        case 'surroundings': if (surroundingsSpread > 1) surroundingsSpread -= 1; document.getElementById('surroundingsSpread').innerHTML = surroundingsSpread; break;
-        case 'beach': if (beachSpread > 1) beachSpread -= 1; document.getElementById('beachSpread').innerHTML = beachSpread; break;
-        case 'water1': if (water1Spread > 1) water1Spread -= 1; document.getElementById('water1Spread').innerHTML = water1Spread; break;
-        case 'water2': if (water2Spread > 1) water2Spread -= 1; document.getElementById('water2Spread').innerHTML = water2Spread; break;
+        case 'center': if (CURRENT_PRESET.centerSpread > 1) CURRENT_PRESET.centerSpread -= 1; break;
+        case 'surroundings': if (CURRENT_PRESET.surroundingsSpread > 1) CURRENT_PRESET.surroundingsSpread -= 1; break;
+        case 'beach': if (CURRENT_PRESET.beachSpread > 1) CURRENT_PRESET.beachSpread -= 1; break;
+        case 'water1': if (CURRENT_PRESET.water1Spread > 1) CURRENT_PRESET.water1Spread -= 1; break;
+        case 'water2': if (CURRENT_PRESET.water2Spread > 1) CURRENT_PRESET.water2Spread -= 1; break;
         default: break;
       }
       break;
     case 'proba':
       switch (categ) {
-        case 'center': if (centerSpreadProbability > 1) centerSpreadProbability -= 1; document.getElementById('centerSpreadProbability').innerHTML = `${centerSpreadProbability}%`; break;
-        case 'surroundings': if (surroundingsSpreadProbability > 1) surroundingsSpreadProbability -= 1; document.getElementById('surroundingsSpreadProbability').innerHTML = `${surroundingsSpreadProbability}%`; break;
-        case 'beach': if (beachSpreadProbability > 1) beachSpreadProbability -= 1; document.getElementById('beachSpreadProbability').innerHTML = `${beachSpreadProbability}%`; break;
-        case 'water1': if (water1SpreadProbability > 1) water1SpreadProbability -= 1; document.getElementById('water1SpreadProbability').innerHTML = `${water1SpreadProbability}%`; break;
-        case 'water2': if (water2SpreadProbability > 1) water2SpreadProbability -= 1; document.getElementById('water2SpreadProbability').innerHTML = `${water2SpreadProbability}%`; break;
+        case 'center': if (CURRENT_PRESET.centerSpreadProbability > 1) CURRENT_PRESET.centerSpreadProbability -= 1; break;
+        case 'surroundings': if (CURRENT_PRESET.surroundingsSpreadProbability > 1) CURRENT_PRESET.surroundingsSpreadProbability -= 1; break;
+        case 'beach': if (CURRENT_PRESET.beachSpreadProbability > 1) CURRENT_PRESET.beachSpreadProbability -= 1; break;
+        case 'water1': if (CURRENT_PRESET.water1SpreadProbability > 1) CURRENT_PRESET.water1SpreadProbability -= 1; break;
+        case 'water2': if (CURRENT_PRESET.water2SpreadProbability > 1) CURRENT_PRESET.water2SpreadProbability -= 1; break;
         default: break;
       }
       break;
     case 'count':
-      if (islandCount > 1) islandCount -= 1; document.getElementById('islandCount').innerHTML = islandCount;
+      if (CURRENT_PRESET.islandCount > 1) CURRENT_PRESET.islandCount -= 1; 
       break;
     default:
       break;
   }
+
+  updateValues();
+
 }
 window.onMinusClick = onMinusClick;
 
@@ -215,35 +391,36 @@ function onPlusClick(categ, type) {
   switch (type) {
     case 'spread':
       switch (categ) {
-        case 'center': centerSpread += 1; document.getElementById('centerSpread').innerHTML = centerSpread; break;
-        case 'surroundings': surroundingsSpread += 1; document.getElementById('surroundingsSpread').innerHTML = surroundingsSpread; break;
-        case 'beach': beachSpread += 1; document.getElementById('beachSpread').innerHTML = beachSpread; break;
-        case 'water1': water1Spread += 1; document.getElementById('water1Spread').innerHTML = water1Spread; break;
-        case 'water2': water2Spread += 1; document.getElementById('water2Spread').innerHTML = water2Spread; break;
+        case 'center': CURRENT_PRESET.centerSpread += 1; break;
+        case 'surroundings': CURRENT_PRESET.surroundingsSpread += 1; break;
+        case 'beach': CURRENT_PRESET.beachSpread += 1; break;
+        case 'water1': CURRENT_PRESET.water1Spread += 1; break;
+        case 'water2': CURRENT_PRESET.water2Spread += 1; break;
         default: break;
       }
       break;
     case 'proba':
       switch (categ) {
-        case 'center': if (centerSpreadProbability < 99) centerSpreadProbability += 1; document.getElementById('centerSpreadProbability').innerHTML = `${centerSpreadProbability}%`; break;
-        case 'surroundings': if (surroundingsSpreadProbability < 99) surroundingsSpreadProbability += 1; document.getElementById('surroundingsSpreadProbability').innerHTML = `${surroundingsSpreadProbability}%`; break;
-        case 'beach': if (beachSpreadProbability < 99) beachSpreadProbability += 1; document.getElementById('beachSpreadProbability').innerHTML = `${beachSpreadProbability}%`; break;
-        case 'water1': if (water1SpreadProbability < 99) water1SpreadProbability += 1; document.getElementById('water1SpreadProbability').innerHTML = `${water1SpreadProbability}%`; break;
-        case 'water2': if (water2SpreadProbability < 99) water2SpreadProbability += 1; document.getElementById('water2SpreadProbability').innerHTML = `${water2SpreadProbability}%`; break;
+        case 'center': if (CURRENT_PRESET.centerSpreadProbability < 99) CURRENT_PRESET.centerSpreadProbability += 1; break;
+        case 'surroundings': if (CURRENT_PRESET.surroundingsSpreadProbability < 99) CURRENT_PRESET.surroundingsSpreadProbability += 1; break;
+        case 'beach': if (CURRENT_PRESET.beachSpreadProbability < 99) CURRENT_PRESET.beachSpreadProbability += 1; break;
+        case 'water1': if (CURRENT_PRESET.water1SpreadProbability < 99) CURRENT_PRESET.water1SpreadProbability += 1; break;
+        case 'water2': if (CURRENT_PRESET.water2SpreadProbability < 99) CURRENT_PRESET.water2SpreadProbability += 1; break;
         default: break;
       }
       break;
     case 'count':
-      islandCount += 1; document.getElementById('islandCount').innerHTML = islandCount;
+      CURRENT_PRESET.islandCount += 1;
       break;
     default:
       break;
   }
+
+  updateValues();
 }
 window.onPlusClick = onPlusClick;
 
 function setupGrid() {
-
   let x_coord = 0;
   let y_coord = 0;
 
@@ -344,15 +521,15 @@ function generateMap() {
 X_SIZE: ${X_SIZE}
 Y_SIZE: ${Y_SIZE}
 
-Island Count: ${islandCount}
-Center Spread: ${centerSpread} - ${centerSpreadProbability}%
-Surroundings Spread: ${surroundingsSpread} - ${surroundingsSpreadProbability}%
-Beach Spread: ${beachSpread} - ${beachSpreadProbability}%
-Water1 Spread: ${water1Spread} - ${water1SpreadProbability}%
-Water2 Spread: ${water2Spread} - ${water2SpreadProbability}%
+Island Count: ${CURRENT_PRESET.islandCount}
+Center Spread: ${CURRENT_PRESET.centerSpread} - ${CURRENT_PRESET.centerSpreadProbability}%
+Surroundings Spread: ${CURRENT_PRESET.surroundingsSpread} - ${CURRENT_PRESET.surroundingsSpreadProbability}%
+Beach Spread: ${CURRENT_PRESET.beachSpread} - ${CURRENT_PRESET.beachSpreadProbability}%
+Water1 Spread: ${CURRENT_PRESET.water1Spread} - ${CURRENT_PRESET.water1SpreadProbability}%
+Water2 Spread: ${CURRENT_PRESET.water2Spread} - ${CURRENT_PRESET.water2SpreadProbability}%
 `);
   // ISLANDS CENTAL POINTS ********************************************************************************************
-  for (let index = 0; index < islandCount; index++) {
+  for (let index = 0; index < CURRENT_PRESET.islandCount; index++) {
     // Centre de l'île 0
     let rndX = getRandomIntegerBetween(Math.round(X_SIZE * .15), Math.round(X_SIZE * .85));
     let rndY = getRandomIntegerBetween(Math.round(Y_SIZE * .15), Math.round(Y_SIZE * .85));
@@ -419,7 +596,7 @@ Water2 Spread: ${water2Spread} - ${water2SpreadProbability}%
     let elementXCoord = islandCentralElement.id.split('-')[0];
     let elementYCoord = islandCentralElement.id.split('-')[1];
     //console.log(`${elementXCoord}-${elementYCoord}`);
-    let elementSurroundings = getCellCrossCells(Number(elementXCoord), Number(elementYCoord));
+    let elementSurroundings = getCellSurroundingCells(Number(elementXCoord), Number(elementYCoord));
     for (let elementSurrounding of elementSurroundings) {
       if (elementSurrounding != null) {
         let element = document.getElementById(elementSurrounding);
@@ -436,7 +613,7 @@ Water2 Spread: ${water2Spread} - ${water2SpreadProbability}%
 
   // SPREAD -------------------------------------------------------------------
 
-  for (let index = 0; index < centerSpread; index++) {
+  for (let index = 0; index < CURRENT_PRESET.centerSpread; index++) {
     let islandCentralElements3 = Array.from(document.getElementsByClassName('island-center'));
 
     for (let islandCentralElement of islandCentralElements3) {
@@ -449,7 +626,7 @@ Water2 Spread: ${water2Spread} - ${water2SpreadProbability}%
           let element = document.getElementById(elementSurrounding);
           if (!element.classList.contains('island-center')) {
             let rnd = getRandomIntegerBetween(0, 100);
-            if (rnd < centerSpreadProbability) {
+            if (rnd < CURRENT_PRESET.centerSpreadProbability) {
               //element.classList.add('surrounding');
               element.classList.add('island-center');
               element.classList.add('spreaded');
@@ -484,7 +661,7 @@ Water2 Spread: ${water2Spread} - ${water2SpreadProbability}%
 
   // SPREAD -------------------------------------------------------------------
 
-  for (let index = 0; index < surroundingsSpread; index++) {
+  for (let index = 0; index < CURRENT_PRESET.surroundingsSpread; index++) {
     let islandSurroundingElements = Array.from(document.getElementsByClassName('surrounding'));
 
     for (let islandSurroundingElement of islandSurroundingElements) {
@@ -497,7 +674,7 @@ Water2 Spread: ${water2Spread} - ${water2SpreadProbability}%
           let element = document.getElementById(elementSurrounding);
           if (!element.classList.contains('island-center') && !element.classList.contains('surrounding')) {
             let rnd = getRandomIntegerBetween(0, 100);
-            if (rnd < surroundingsSpreadProbability) {
+            if (rnd < CURRENT_PRESET.surroundingsSpreadProbability) {
               element.classList.add('surrounding');
             }
           }
@@ -531,7 +708,7 @@ Water2 Spread: ${water2Spread} - ${water2SpreadProbability}%
 
   // SPREAD -------------------------------------------------------------------
 
-  for (let index = 0; index < beachSpread; index++) {    
+  for (let index = 0; index < CURRENT_PRESET.beachSpread; index++) {    
     let islandBeachElements = Array.from(document.getElementsByClassName('beach'));
     for (let islandSurroundingElement of islandBeachElements) {
       let elementXCoord = islandSurroundingElement.id.split('-')[0];
@@ -545,7 +722,7 @@ Water2 Spread: ${water2Spread} - ${water2SpreadProbability}%
             && !element.classList.contains('surrounding') 
             && !element.classList.contains('beach')) {
             let rnd = getRandomIntegerBetween(0, 100);
-            if (rnd < beachSpreadProbability) {
+            if (rnd < CURRENT_PRESET.beachSpreadProbability) {
               element.classList.add('beach');
             }
           }
@@ -564,7 +741,7 @@ Water2 Spread: ${water2Spread} - ${water2SpreadProbability}%
     let elementXCoord = islandBeachElement.id.split('-')[0];
     let elementYCoord = islandBeachElement.id.split('-')[1];
     //console.log(`${elementXCoord}-${elementYCoord}`);
-    let elementWaters = getCellCrossCells(Number(elementXCoord), Number(elementYCoord));
+    let elementWaters = getCellSurroundingCells(Number(elementXCoord), Number(elementYCoord));
     for (let elementWater of elementWaters) {
       if (elementWater != null) {
         let element = document.getElementById(elementWater);
@@ -581,14 +758,14 @@ Water2 Spread: ${water2Spread} - ${water2SpreadProbability}%
 
   // SPREAD -------------------------------------------------------------------
 
-  for (let index = 0; index < water1Spread; index++) {
+  for (let index = 0; index < CURRENT_PRESET.water1Spread; index++) {
     let islandWater1Elements2 = Array.from(document.getElementsByClassName('water-1'));
 
     for (let islandWater1Element of islandWater1Elements2) {
       let elementXCoord = islandWater1Element.id.split('-')[0];
       let elementYCoord = islandWater1Element.id.split('-')[1];
       //console.log(`${elementXCoord}-${elementYCoord}`);
-      let elementWaters = getCellCrossCells(Number(elementXCoord), Number(elementYCoord));
+      let elementWaters = getCellSurroundingCells(Number(elementXCoord), Number(elementYCoord));
       for (let elementWater of elementWaters) {
         if (elementWater != null) {
           let element = document.getElementById(elementWater);
@@ -597,7 +774,7 @@ Water2 Spread: ${water2Spread} - ${water2SpreadProbability}%
             && !element.classList.contains('beach') 
             && !element.classList.contains('water-1')) {
             let rnd = getRandomIntegerBetween(0, 100);
-            if (rnd < water1SpreadProbability) {
+            if (rnd < CURRENT_PRESET.water1SpreadProbability) {
               element.classList.add('water-1');
             }
           }
@@ -634,7 +811,7 @@ Water2 Spread: ${water2Spread} - ${water2SpreadProbability}%
 
   // SPREAD -------------------------------------------------------------------
 
-  for (let index = 0; index < water2Spread; index++) {
+  for (let index = 0; index < CURRENT_PRESET.water2Spread; index++) {
     let islandWater2Elements = Array.from(document.getElementsByClassName('water-2'));
 
     for (let islandWater2Element of islandWater2Elements) {
@@ -651,7 +828,7 @@ Water2 Spread: ${water2Spread} - ${water2SpreadProbability}%
             && !element.classList.contains('water-1')
             && !element.classList.contains('water-2')) {
             let rnd = getRandomIntegerBetween(0, 100);
-            if (rnd < water2SpreadProbability) {
+            if (rnd < CURRENT_PRESET.water2SpreadProbability) {
               element.classList.add('water-2');
             }
           }

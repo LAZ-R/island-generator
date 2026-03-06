@@ -1,5 +1,6 @@
 .lzr {
   --theme: 'light'; /* 'dark' | 'light' | 'alternative */
+  --map-theme: 'basic';
 
   /* ####################################################################### */
   /* COLORS */

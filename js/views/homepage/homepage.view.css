@@ -10,41 +10,74 @@
 
   .grid-cell {
     --cell-size: calc(100svw / var(--x-size));
+    --background-color: if(
+      style(--map-theme: 'realistic'):  hsl(227, 33%, 25%);
+      style(--map-theme: 'volcanic'):  hsl(190, 40%, 45%);
+      style(--map-theme: 'fjord'):   hsl(190, 80%, 40%);
+      else: hsl(200, 80%, 50%)
+    );
     display: flex;
     justify-content: center;
     align-items: center;
     aspect-ratio: 1/1;
-    background-color: hsl(200, 80%, 50%);
+    background-color: var(--background-color);
     min-width: var(--cell-size); width: var(--cell-size); max-width: var(--cell-size);
     min-height: var(--cell-size); height: var(--cell-size); max-height: var(--cell-size);
     font-size: 12px;
     color: transparent;
-    /* border: 1px solid black; */
 
     &.island-center {
-      /* background-color: hsl(111, 21%, 30%); */
-      background-color: hsl(111, 21%, 36%);
+      --background-color: if(
+        style(--map-theme: 'realistic'):  hsl(131, 10%, 33%);
+        style(--map-theme: 'volcanic'):  hsl(30, 5%, 30%);
+        style(--map-theme: 'fjord'):   hsl(178, 10%, 98%);
+        else: hsl(111, 21%, 36%)
+      );
 
       &.spreaded {
-        border: none;
-        background-color: hsl(111, 21%, 36%);
+        --background-color: if(
+          style(--map-theme: 'realistic'):  hsl(139, 12%, 35%);
+          style(--map-theme: 'volcanic'):  hsl(30, 5%, 30%);
+          style(--map-theme: 'fjord'):   hsl(178, 10%, 98%);
+          else: hsl(111, 21%, 36%)
+        );
       }
     }
 
     &.surrounding {
-      background-color: hsl(80, 17%, 56%);
+      --background-color: if(
+        style(--map-theme: 'realistic'):  hsl(34, 25%, 55%);
+        style(--map-theme: 'volcanic'):  hsl(30, 5%, 40%);
+        style(--map-theme: 'fjord'):   hsl(178, 60%, 95%);
+        else: hsl(80, 17%, 56%)
+      );
     }
 
     &.beach {
-      background-color: hsl(39, 50%, 90%);
+      --background-color: if(
+        style(--map-theme: 'realistic'):  hsl(10, 51%, 91%);
+        style(--map-theme: 'volcanic'):  hsl(30, 5%, 50%);
+        style(--map-theme: 'fjord'):   hsl(185, 80%, 80%);
+        else: hsl(39, 50%, 90%)
+      );
     }
 
     &.water-1 {
-      background-color: hsl(175, 70%, 70%);
+      --background-color: if(
+        style(--map-theme: 'realistic'):  hsl(165, 25%, 69%);
+        style(--map-theme: 'volcanic'):  hsl(190, 30%, 55%);
+        style(--map-theme: 'fjord'):   hsl(185, 80%, 60%);
+        else: hsl(175, 70%, 70%)
+      );
     }
 
     &.water-2 {
-      background-color: hsl(190, 80%, 50%);
+      --background-color: if(
+        style(--map-theme: 'realistic'):  hsl(197, 48%, 36%);
+        style(--map-theme: 'volcanic'):  hsl(190, 35%, 50%);
+        style(--map-theme: 'fjord'):   hsl(190, 80%, 50%);
+        else: hsl(190, 80%, 50%)
+      );
     }
 
     /* &.central-point {
