@@ -18,8 +18,8 @@ const FOOTER = document.getElementById('footer');
 
 let MAIN_WIDTH = MAIN.getBoundingClientRect().width;
 
-const X_SIZE = 64;//Math.round(MAIN_WIDTH / 6);
-const Y_SIZE = 86;//Math.round(MAIN_WIDTH / 4.5);
+const X_SIZE = 128;//Math.round(MAIN_WIDTH / 6);
+const Y_SIZE = 128;//86//Math.round(MAIN_WIDTH / 4.5);
 
 const PRESETS = [
   // DEFAULT
@@ -27,15 +27,15 @@ const PRESETS = [
     id: 'default',
     name: 'Default',
     islandCount: 12,
-    centerSpread: 16,
+    centerSpread: 32,
     centerSpreadProbability: 16,
-    surroundingsSpread: 4,
+    surroundingsSpread: 4 * 2,
     surroundingsSpreadProbability: 8,
-    beachSpread: 2,
+    beachSpread: 2 * 2,
     beachSpreadProbability: 8,
-    water1Spread: 2,
+    water1Spread: 2 * 2,
     water1SpreadProbability: 16,
-    water2Spread: 6,
+    water2Spread: 6 * 2,
     water2SpreadProbability: 16,
   },
   // archipel réaliste
@@ -43,15 +43,15 @@ const PRESETS = [
     id: 'realistic',
     name: 'Realistic',
     islandCount: 6,
-    centerSpread: 26,
+    centerSpread: 26 * 2,
     centerSpreadProbability: 19,
-    surroundingsSpread: 6,
+    surroundingsSpread: 6 * 2,
     surroundingsSpreadProbability: 12,
-    beachSpread: 1,
+    beachSpread: 1 * 2,
     beachSpreadProbability: 28,
-    water1Spread: 5,
+    water1Spread: 5 * 2,
     water1SpreadProbability: 20,
-    water2Spread: 10,
+    water2Spread: 10 * 2,
     water2SpreadProbability: 11,
   },
   // tropical islands
@@ -59,15 +59,15 @@ const PRESETS = [
     id: 'tropical',
     name: 'Tropical islands',
     islandCount: 14,
-    centerSpread: 14,
+    centerSpread: 14 * 2,
     centerSpreadProbability: 17,
-    surroundingsSpread: 3,
+    surroundingsSpread: 3 * 2,
     surroundingsSpreadProbability: 10,
-    beachSpread: 2,
+    beachSpread: 2 * 2,
     beachSpreadProbability: 40,
-    water1Spread: 6,
+    water1Spread: 6 * 2,
     water1SpreadProbability: 25,
-    water2Spread: 10,
+    water2Spread: 10 * 2,
     water2SpreadProbability: 18,
   },
   // volcanic islands
@@ -75,15 +75,15 @@ const PRESETS = [
     id: 'volcanic',
     name: 'Volcanic islands',
     islandCount: 4,
-    centerSpread: 30,
+    centerSpread: 30 * 2,
     centerSpreadProbability: 20,
-    surroundingsSpread: 4,
+    surroundingsSpread: 4 * 2,
     surroundingsSpreadProbability: 10,
-    beachSpread: 1,
+    beachSpread: 1 * 2,
     beachSpreadProbability: 25,
-    water1Spread: 3,
+    water1Spread: 3 * 2,
     water1SpreadProbability: 20,
-    water2Spread: 10,
+    water2Spread: 10 * 2,
     water2SpreadProbability: 14,
   },
   // fjord islands
@@ -91,99 +91,72 @@ const PRESETS = [
     id: 'fjord',
     name: 'Fjords',
     islandCount: 6,
-    centerSpread: 26,
+    centerSpread: 26 * 2,
     centerSpreadProbability: 14,
-    surroundingsSpread: 7,
+    surroundingsSpread: 7 * 2,
     surroundingsSpreadProbability: 10,
-    beachSpread: 1,
+    beachSpread: 1 * 2,
     beachSpreadProbability: 20,
-    water1Spread: 6,
+    water1Spread: 6 * 2,
     water1SpreadProbability: 30,
-    water2Spread: 12,
+    water2Spread: 12 * 2,
     water2SpreadProbability: 15,
   },
   {
     id: 'continent',
     name: 'Continent',
     islandCount: 3,
-    centerSpread: 36,
+    centerSpread: 36 * 2,
     centerSpreadProbability: 22,
-    surroundingsSpread: 6,
+    surroundingsSpread: 6 * 2,
     surroundingsSpreadProbability: 12,
-    beachSpread: 1,
+    beachSpread: 1 * 2,
     beachSpreadProbability: 16,
-    water1Spread: 2,
+    water1Spread: 2 * 2,
     water1SpreadProbability: 6,
-    water2Spread: 8,
+    water2Spread: 8 * 2,
     water2SpreadProbability: 12,
   },
   {
     id: 'coral-hell',
     name: 'Coral hell',
     islandCount: 16,
-    centerSpread: 8,
+    centerSpread: 8 * 2,
     centerSpreadProbability: 2,
-    surroundingsSpread: 6,
+    surroundingsSpread: 6 * 2,
     surroundingsSpreadProbability: 3,
-    beachSpread: 4,
+    beachSpread: 4 * 2,
     beachSpreadProbability: 8,
-    water1Spread: 4,
+    water1Spread: 4 * 2,
     water1SpreadProbability: 8,
-    water2Spread: 12,
+    water2Spread: 12 * 2,
     water2SpreadProbability: 8,
   },
   {
     id: 'mangrove',
     name: 'Mangrove delta',
     islandCount: 24,
-    centerSpread: 2,
+    centerSpread: 2 * 2,
     centerSpreadProbability: 2,
-    surroundingsSpread: 12,
+    surroundingsSpread: 12 * 2,
     surroundingsSpreadProbability: 12,
-    beachSpread: 4,
+    beachSpread: 4 * 2,
     beachSpreadProbability: 10,
-    water1Spread: 6,
+    water1Spread: 6 * 2,
     water1SpreadProbability: 6,
-    water2Spread: 12,
+    water2Spread: 12 * 2,
     water2SpreadProbability: 14,
   },
 ];
 
-let CURRENT_PRESET = {
-  islandCount: 12,
+let CURRENT_PRESET = {};
 
-  centerSpread: 16,
-  centerSpreadProbability: 16,
+let CURRENT_ZOOM = 1;
+let CENTER_X = 0.5;
+let CENTER_Y = 0.5;
 
-  surroundingsSpread: 4,
-  surroundingsSpreadProbability: 8,
-
-  beachSpread: 2,
-  beachSpreadProbability: 8,
-
-  water1Spread: 2,
-  water1SpreadProbability: 16,
-
-  water2Spread: 6,
-  water2SpreadProbability: 16,
-};
-
-/* let islandCount = 12;
-
-let centerSpread = Math.round(X_SIZE / 10 * 2.5);
-let centerSpreadProbability = 16;
-
-let surroundingsSpread = Math.round(X_SIZE / 15);
-let surroundingsSpreadProbability = 8;
-
-let beachSpread = Math.round(X_SIZE / 30);
-let beachSpreadProbability = 8;
-
-let water1Spread = Math.round(X_SIZE / 30);
-let water1SpreadProbability = 16;
-
-let water2Spread = Math.round(X_SIZE / 10);
-let water2SpreadProbability = 16; */
+let CURRENT_QUARTER = null;
+let FAILED_QUARTERS = 0;
 
 // FUNCTIONS //////////////////////////////////////////////////////////////////////////////////////
 
@@ -199,137 +172,415 @@ export function render() {
   }
 
   // Set MAIN layout
-  MAIN.innerHTML = `<div id="mainMapContainer" class="main-map-container"></div>`;
+  MAIN.innerHTML = `
+  <div class="top-container">
+    <div class="main-container">
+      <div id="mapContainer" class="map-container"></div>
+      <div id="mapMask" class="map-mask hidden"></div>
+      <div class="interactive-panel crt">
+        <div id="top_left_panel" onclick="scanQuarter('top', 'left')" class="quarter-panel top-left"></div>
+        <div id="top_right_panel" onclick="scanQuarter('top', 'right')" class="quarter-panel top-right"></div>
+        <div id="bottom_left_panel" onclick="scanQuarter('bottom', 'left')" class="quarter-panel bottom-left"></div>
+        <div id="bottom_right_panel" onclick="scanQuarter('bottom', 'right')" class="quarter-panel bottom-right"></div>
+      </div>
+      <div id="screenContainer" class="screen-container"></div>
+    </div>
+  </div>
+
+  <div class="page-container">
+
+    <div class="top-info-area lzr-margin-bottom">Scanotron 3000&copy
+    </div>
+
+    <div class="controls-container lzr-margin-bottom">
+      <div class="directional-cross-container">
+        <button id="top_left_button" onclick="onQuarterSelect('top', 'left')" class="lzr-button lzr-solid quarter-button">NORTH<br>WEST</button>
+        <button id="top_right_button" onclick="onQuarterSelect('top', 'right')" class="lzr-button lzr-solid quarter-button">NORTH<br>EAST</button>
+        <button id="bottom_left_button" onclick="onQuarterSelect('bottom', 'left')" class="lzr-button lzr-solid quarter-button">SOUTH<br>WEST</button>
+        <button id="bottom_right_button" onclick="onQuarterSelect('bottom', 'right')" class="lzr-button lzr-solid quarter-button">SOUTH<br>EAST</button>
+      </div>
+      <div class="action-buttons-container">
+        <button id="scan_button" onclick="onScanClick()" class="lzr-button">SCAN</button>
+      </div>
+    </div>
+
+    <div class="bottom-area">
+      <div class="credits">
+        <p>on verra bien quoi mettre<br>d'autre comme infos</p>
+      </div>
+      <div class="speaker">
+        <div class="speaker-line small"></div>
+        <div class="speaker-line medium"></div>
+        <div class="speaker-line large"></div>
+        <div class="speaker-line medium"></div>
+        <div class="speaker-line small"></div>
+      </div>
+    </div>
+  </div>
+
+    
+
+    <div class="lzr-drawer lzr-flat"">
+      <div class="tile-header">
+        <div>
+          <span class="header-title">Config</span>
+        </div>
+        <div class="tile-caret">
+        ${getSvgIcon('chevron-right', 'm', null)}
+        </div>
+        <input type="checkbox">
+      </div>
+      <div class="expandable-wrapper">
+        <div class="expandable-inner">
+          <div class="inner-body">
+
+            <div class="top-info-area lzr-margin-bottom">
+              ${getPresetSelectDom()}
+              <button class="lzr-button lzr-solid lzr-success" onclick="onGenerateClick()">Generate mission</button>
+            </div>
+            
+            <div class="line-2">
+              <div class="block">
+                <span>Count</span>
+                <div class="block-line">
+                  <button onclick="onMinusClick('island', 'count')">-</button>
+                  <span id="islandCount">${CURRENT_PRESET.islandCount}</span>
+                  <button onclick="onPlusClick('island', 'count')">+</button>
+                </div>
+              </div>
+            </div>
+
+            <div class="lines-container">
+
+              <div class="line">
+                <span>Core</span>
+                <div class="block">
+                  <span>Spread</span>
+                  <div class="block-line spread">
+                    <button onclick="onMinusClick('center', 'spread')">-</button>
+                    <span id="centerSpread">${CURRENT_PRESET.centerSpread}</span>
+                    <button onclick="onPlusClick('center', 'spread')">+</button>
+                  </div>
+                </div>
+                <div class="block">
+                  <span>Proba</span>
+                  <div class="block-line">
+                    <button onclick="onMinusClick('center', 'proba')">-</button>
+                    <span id="centerSpreadProbability">${CURRENT_PRESET.centerSpreadProbability}%</span>
+                    <button onclick="onPlusClick('center', 'proba')">+</button>
+                  </div>
+                </div>
+              </div>
+              <div class="line">
+                <span>Land</span>
+                <div class="block">
+                  <span>Spread</span>
+                  <div class="block-line spread">
+                    <button onclick="onMinusClick('surroundings', 'spread')">-</button>
+                    <span id="surroundingsSpread">${CURRENT_PRESET.surroundingsSpread}</span>
+                    <button onclick="onPlusClick('surroundings', 'spread')">+</button>
+                  </div>
+                </div>
+                <div class="block">
+                  <span>Proba</span>
+                  <div class="block-line">
+                    <button onclick="onMinusClick('surroundings', 'proba')">-</button>
+                    <span id="surroundingsSpreadProbability">${CURRENT_PRESET.surroundingsSpreadProbability}%</span>
+                    <button onclick="onPlusClick('surroundings', 'proba')">+</button>
+                  </div>
+                </div>
+              </div>
+              <div class="line">
+                <span>Beach</span>
+                <div class="block">
+                  <span>Spread</span>
+                  <div class="block-line spread">
+                    <button onclick="onMinusClick('beach', 'spread')">-</button>
+                    <span id="beachSpread">${CURRENT_PRESET.beachSpread}</span>
+                    <button onclick="onPlusClick('beach', 'spread')">+</button>
+                  </div>
+                </div>
+                <div class="block">
+                  <span>Proba</span>
+                  <div class="block-line">
+                    <button onclick="onMinusClick('beach', 'proba')">-</button>
+                    <span id="beachSpreadProbability">${CURRENT_PRESET.beachSpreadProbability}%</span>
+                    <button onclick="onPlusClick('beach', 'proba')">+</button>
+                  </div>
+                </div>
+              </div>
+              <div class="line">
+                <span>Water 1</span>
+                <div class="block">
+                  <span>Spread</span>
+                  <div class="block-line spread">
+                    <button onclick="onMinusClick('water1', 'spread')">-</button>
+                    <span id="water1Spread">${CURRENT_PRESET.water1Spread}</span>
+                    <button onclick="onPlusClick('water1', 'spread')">+</button>
+                  </div>
+                </div>
+                <div class="block">
+                  <span>Proba</span>
+                  <div class="block-line">
+                    <button onclick="onMinusClick('water1', 'proba')">-</button>
+                    <span id="water1SpreadProbability">${CURRENT_PRESET.water1SpreadProbability}%</span>
+                    <button onclick="onPlusClick('water1', 'proba')">+</button>
+                  </div>
+                </div>
+              </div>
+              <div class="line">
+                <span>Water 2</span>
+                <div class="block">
+                  <span>Spread</span>
+                  <div class="block-line spread">
+                    <button onclick="onMinusClick('water2', 'spread')">-</button>
+                    <span id="water2Spread">${CURRENT_PRESET.water2Spread}</span>
+                    <button onclick="onPlusClick('water2', 'spread')">+</button>
+                  </div>
+                </div>
+                <div class="block">
+                  <span>Proba</span>
+                  <div class="block-line">
+                    <button onclick="onMinusClick('water2', 'proba')">-</button>
+                    <span id="water2SpreadProbability">${CURRENT_PRESET.water2SpreadProbability}%</span>
+                    <button onclick="onPlusClick('water2', 'proba')">+</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
 
 
   updateMenuDom('homepage');
-  setupGrid();
+  //setupGrid();
+  CURRENT_PRESET = {...PRESETS[0]};
+  updateValues();
 
-  let mapHeight = document.getElementById('mainMapContainer').getBoundingClientRect().height;
-  //console.log(mapHeight);
-  MAIN.style.setProperty('--height--main', `${mapHeight}px`);
-  // Set FOOTER layout
-  FOOTER.style.setProperty('--height--footer', `calc(100svh - ${mapHeight}px)`);
-  FOOTER.innerHTML = `
-  <div class="line-2">
-    ${getPresetSelectDom()}
-    <div class="block">
-      <span>Count</span>
-      <div class="block-line">
-        <button onclick="onMinusClick('island', 'count')">-</button>
-        <span id="islandCount">${CURRENT_PRESET.islandCount}</span>
-        <button onclick="onPlusClick('island', 'count')">+</button>
-      </div>
-    </div>
-  </div>
+  setTimeout(() => {
+    onGenerateClick();
+  }, 300);
 
-  <div class="lines-container">
-
-    <div class="line">
-      <span>Core</span>
-      <div class="block">
-        <span>Spread</span>
-        <div class="block-line spread">
-          <button onclick="onMinusClick('center', 'spread')">-</button>
-          <span id="centerSpread">${CURRENT_PRESET.centerSpread}</span>
-          <button onclick="onPlusClick('center', 'spread')">+</button>
-        </div>
-      </div>
-      <div class="block">
-        <span>Proba</span>
-        <div class="block-line">
-          <button onclick="onMinusClick('center', 'proba')">-</button>
-          <span id="centerSpreadProbability">${CURRENT_PRESET.centerSpreadProbability}%</span>
-          <button onclick="onPlusClick('center', 'proba')">+</button>
-        </div>
-      </div>
-    </div>
-    <div class="line">
-      <span>Land</span>
-      <div class="block">
-        <span>Spread</span>
-        <div class="block-line spread">
-          <button onclick="onMinusClick('surroundings', 'spread')">-</button>
-          <span id="surroundingsSpread">${CURRENT_PRESET.surroundingsSpread}</span>
-          <button onclick="onPlusClick('surroundings', 'spread')">+</button>
-        </div>
-      </div>
-      <div class="block">
-        <span>Proba</span>
-        <div class="block-line">
-          <button onclick="onMinusClick('surroundings', 'proba')">-</button>
-          <span id="surroundingsSpreadProbability">${CURRENT_PRESET.surroundingsSpreadProbability}%</span>
-          <button onclick="onPlusClick('surroundings', 'proba')">+</button>
-        </div>
-      </div>
-    </div>
-    <div class="line">
-      <span>Beach</span>
-      <div class="block">
-        <span>Spread</span>
-        <div class="block-line spread">
-          <button onclick="onMinusClick('beach', 'spread')">-</button>
-          <span id="beachSpread">${CURRENT_PRESET.beachSpread}</span>
-          <button onclick="onPlusClick('beach', 'spread')">+</button>
-        </div>
-      </div>
-      <div class="block">
-        <span>Proba</span>
-        <div class="block-line">
-          <button onclick="onMinusClick('beach', 'proba')">-</button>
-          <span id="beachSpreadProbability">${CURRENT_PRESET.beachSpreadProbability}%</span>
-          <button onclick="onPlusClick('beach', 'proba')">+</button>
-        </div>
-      </div>
-    </div>
-    <div class="line">
-      <span>Water 1</span>
-      <div class="block">
-        <span>Spread</span>
-        <div class="block-line spread">
-          <button onclick="onMinusClick('water1', 'spread')">-</button>
-          <span id="water1Spread">${CURRENT_PRESET.water1Spread}</span>
-          <button onclick="onPlusClick('water1', 'spread')">+</button>
-        </div>
-      </div>
-      <div class="block">
-        <span>Proba</span>
-        <div class="block-line">
-          <button onclick="onMinusClick('water1', 'proba')">-</button>
-          <span id="water1SpreadProbability">${CURRENT_PRESET.water1SpreadProbability}%</span>
-          <button onclick="onPlusClick('water1', 'proba')">+</button>
-        </div>
-      </div>
-    </div>
-    <div class="line">
-      <span>Water 2</span>
-      <div class="block">
-        <span>Spread</span>
-        <div class="block-line spread">
-          <button onclick="onMinusClick('water2', 'spread')">-</button>
-          <span id="water2Spread">${CURRENT_PRESET.water2Spread}</span>
-          <button onclick="onPlusClick('water2', 'spread')">+</button>
-        </div>
-      </div>
-      <div class="block">
-        <span>Proba</span>
-        <div class="block-line">
-          <button onclick="onMinusClick('water2', 'proba')">-</button>
-          <span id="water2SpreadProbability">${CURRENT_PRESET.water2SpreadProbability}%</span>
-          <button onclick="onPlusClick('water2', 'proba')">+</button>
-        </div>
-      </div>
-    </div>
-  </div>
-  
-  <button class="lzr-button lzr-solid lzr-primary" onclick="onGenerateClick()">Generate</button>
-  `;
-  
 }
+
+function getQuarterCells(vertical, horizontal) {
+  // 1) Taille de la zone actuellement visible dans la grille
+  // Exemple sur une grille 128 :
+  // zoom 1 => 128 cellules visibles
+  // zoom 2 => 64 cellules visibles
+  // zoom 4 => 32 cellules visibles
+  const visibleWidthInCells = X_SIZE / CURRENT_ZOOM;
+  const visibleHeightInCells = Y_SIZE / CURRENT_ZOOM;
+
+  // 2) Bornes de la zone visible actuelle, en coordonnées relatives [0..1]
+  const visibleLeftRel = CENTER_X - (1 / CURRENT_ZOOM) / 2;
+  const visibleTopRel = CENTER_Y - (1 / CURRENT_ZOOM) / 2;
+
+  // 3) Conversion en indices de cellules (1-based, inclusifs)
+  // Exemple au départ :
+  // left = 0, top = 0 => x: 1..128, y: 1..128
+  const visibleStartX = Math.round(visibleLeftRel * X_SIZE) + 1;
+  const visibleStartY = Math.round(visibleTopRel * Y_SIZE) + 1;
+
+  const visibleEndX = visibleStartX + visibleWidthInCells - 1;
+  const visibleEndY = visibleStartY + visibleHeightInCells - 1;
+
+  // 4) Découpage symétrique de la zone visible en 2 moitiés
+  const halfWidth = visibleWidthInCells / 2;
+  const halfHeight = visibleHeightInCells / 2;
+
+  // X
+  let quarterStartX;
+  let quarterEndX;
+
+  if (horizontal === 'left') {
+    quarterStartX = visibleStartX;
+    quarterEndX = visibleStartX + halfWidth - 1;
+  } else {
+    quarterStartX = visibleStartX + halfWidth;
+    quarterEndX = visibleEndX;
+  }
+
+  // Y
+  let quarterStartY;
+  let quarterEndY;
+
+  if (vertical === 'top') {
+    quarterStartY = visibleStartY;
+    quarterEndY = visibleStartY + halfHeight - 1;
+  } else {
+    quarterStartY = visibleStartY + halfHeight;
+    quarterEndY = visibleEndY;
+  }
+
+  // 5) Construction du tableau de toutes les cellules du quarter
+  // Format : "x-y"
+  const cells = [];
+
+  for (let y = quarterStartY; y <= quarterEndY; y++) {
+    for (let x = quarterStartX; x <= quarterEndX; x++) {
+      cells.push(`${x}-${y}`);
+    }
+  }
+
+  return cells;
+}
+
+function applyMapTransform() {
+  const mapElement = document.getElementById('mapContainer');
+  const translateX = (0.5 - CENTER_X * CURRENT_ZOOM) * 100;
+  const translateY = (0.5 - CENTER_Y * CURRENT_ZOOM) * 100;
+
+  mapElement.style.transform =
+    `translate(${translateX}%, ${translateY}%) scale(${CURRENT_ZOOM})`;
+}
+
+function onQuarterSelect(vertical, horizontal) {
+  //console.log(vertical, horizontal);
+  if (CURRENT_QUARTER == `${vertical}_${horizontal}`) {
+    CURRENT_QUARTER = null;
+  } else {
+    CURRENT_QUARTER = `${vertical}_${horizontal}`;
+  }
+
+  let quarters = document.getElementsByClassName('quarter-panel');
+  for (let quarter of quarters) {
+    if (CURRENT_QUARTER == null) {
+      quarter.classList.remove('blacked');
+    } else {
+      quarter.classList.toggle('blacked', quarter.id != `${CURRENT_QUARTER}_panel`);
+    }
+  }
+
+  let buttons = document.getElementsByClassName('quarter-button');
+  for (let button of buttons) {
+    button.classList.toggle('lzr-solid',button.id != `${CURRENT_QUARTER}_button`);
+  }
+    
+  document.getElementById('scan_button').classList.toggle('lzr-primary', CURRENT_QUARTER != null);
+  document.getElementById('scan_button').classList.toggle('lzr-solid', CURRENT_QUARTER != null);
+}
+window.onQuarterSelect = onQuarterSelect;
+
+function resetSelection() {
+  CURRENT_QUARTER = null;
+  let buttons = document.getElementsByClassName('quarter-button');
+  for (let button of buttons) {
+    button.classList.toggle('lzr-solid',button.id != `${CURRENT_QUARTER}_button`);
+  }
+    
+  document.getElementById('scan_button').classList.toggle('lzr-primary', CURRENT_QUARTER != null);
+  document.getElementById('scan_button').classList.toggle('lzr-solid', CURRENT_QUARTER != null);
+}
+
+function onScanClick() {
+  if (CURRENT_QUARTER == null) return;
+
+  let quarters = document.getElementsByClassName('quarter-panel');
+  for (let quarter of quarters) {
+    if (!quarter.classList.contains('blacked')) {
+      let vertical = quarter.id.split('_')[0];
+      let horizontal = quarter.id.split('_')[1];
+      scanQuarter(vertical, horizontal);
+    };
+  }
+}
+window.onScanClick = onScanClick;
+
+function scanQuarter(vertical, horizontal) {
+  if (CURRENT_ZOOM >= 128) return;
+
+  // Scaning animation
+  let quarterElement = document.getElementById(`${vertical}_${horizontal}_panel`);
+  quarterElement.classList.add('scan');
+
+  setTimeout(() => {
+    quarterElement.classList.remove('scan');
+    // Check condition =========================================================
+    const quarterCells = getQuarterCells(vertical, horizontal);
+    //console.log('nb cellules:', quarterCells.length);
+  
+    const hiddenPointCellElement = document.getElementsByClassName('hidden-point')[0];
+    const hiddenPointId = hiddenPointCellElement.id;
+  
+    if (quarterCells.indexOf(hiddenPointId) != -1) {
+      quarterElement.classList.add('win');
+
+      setTimeout(() => {
+        let quarters = document.getElementsByClassName('quarter-panel');
+        for (let quarter of quarters) {
+          quarter.classList.remove('blacked');
+          quarter.classList.remove('failed');
+          quarter.classList.remove('win');
+        }
+
+        if (CURRENT_ZOOM < 64) {
+          // MAP TRANSFORM
+        
+          const step = 1 / (4 * CURRENT_ZOOM);
+        
+          if (horizontal === 'left') {
+            CENTER_X -= step;
+          } else {
+            CENTER_X += step;
+          }
+        
+          if (vertical === 'top') {
+            CENTER_Y -= step;
+          } else {
+            CENTER_Y += step;
+          }
+        
+          CURRENT_ZOOM *= 2;
+        
+          applyMapTransform();
+          FAILED_QUARTERS = 0;
+        
+          //console.log(`current zoom: ${CURRENT_ZOOM}`);
+        } else {
+          onGenerateClick();
+        }
+        
+      }, 600);
+  
+    } else {
+      let quarters = document.getElementsByClassName('quarter-panel');
+      for (let quarter of quarters) {
+        quarter.classList.remove('blacked');
+      }
+
+      quarterElement.classList.add('failed');
+      FAILED_QUARTERS += 1;
+      if (FAILED_QUARTERS == 3) {
+        setTimeout(() => {
+          document.getElementById('mapMask').classList.add('hidden');
+          setTimeout(() => {
+            onGenerateClick();
+          }, 1000);
+        }, 500);
+      }
+      /* setTimeout(() => {
+        quarterElement.classList.replace('fail', 'failed');
+      }, 600); */
+      // ...
+    }
+
+    resetSelection();
+    
+  }, 2200);
+
+
+
+
+}
+window.scanQuarter = scanQuarter;
 
 function getPresetSelectDom() {
   let str = `
-    <select id="select" class="lzr-select lzr-outlined" onchange="onSelectChange(event)">
+    <select id="select" class="lzr-select lzr-solid" onchange="onSelectChange(event)">
       <button id=custombutton>
         <selectedcontent></selectedcontent>
       </button>
@@ -437,11 +688,16 @@ function onPlusClick(categ, type) {
 window.onPlusClick = onPlusClick;
 
 function setupGrid() {
+  CURRENT_ZOOM = 1;
+  CENTER_X = 0.5;
+  CENTER_Y = 0.5;
+
   let x_coord = 0;
   let y_coord = 0;
 
-  let containerElement = document.getElementById('mainMapContainer');
+  let containerElement = document.getElementById('mapContainer');
   containerElement.innerHTML = '';
+  containerElement.style = '';
   let str = '';
 
   // Ligne
@@ -853,10 +1109,34 @@ Water2 Spread: ${CURRENT_PRESET.water2Spread} - ${CURRENT_PRESET.water2SpreadPro
     }
   }
 
+  setHiddenPoint();
+}
+
+function setHiddenPoint() {
+  let eligibleCells = [];
+  let coreCells = Array.from(document.getElementsByClassName('island-center'));
+  for (let coreCell of coreCells) { eligibleCells.push(coreCell.id); }
+  let landCells = Array.from(document.getElementsByClassName('surroundings'));
+  for (let landCell of landCells) { eligibleCells.push(landCell.id); }
+  let beachCells = Array.from(document.getElementsByClassName('beach'));
+  for (let beachCell of beachCells) { eligibleCells.push(beachCell.id); }
+
+  //console.log(eligibleCells.length);
+
+  let randomCell = eligibleCells[getRandomIntegerBetween(0, eligibleCells.length - 1)];
+
+  document.getElementById(randomCell).classList.add('hidden-point');
 }
 
 function onGenerateClick() {
+  FAILED_QUARTERS = 0;
   setupGrid();
+  let quarters = document.getElementsByClassName('quarter-panel');
+  for (let quarter of quarters) {
+    quarter.classList.remove('failed');
+    quarter.classList.remove('win');
+  }
   generateMap();
+  document.getElementById('mapMask').classList.remove('hidden');
 }
 window.onGenerateClick = onGenerateClick;

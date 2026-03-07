@@ -115,37 +115,37 @@
   /* =================================================== */
 
   --color--primary: if(
-    style(--theme: 'light'):       hsl(20, 80%, 37%)/* hsl(20, 80%, 36%) */;
+    style(--theme: 'light'):       hsl(28, 80%, 50%)/* hsl(28, 80%, 36%) */;
     style(--theme: 'dark'):        hsl(330, 90%, 60%); 
     style(--theme: 'alternative'): hsl(177, 63%, 67%); 
     else: #333333
   );
   --color--primary--hover: if(
-    style(--theme: 'light'):       hsl(20, 80%, 32%);
+    style(--theme: 'light'):       hsl(28, 80%, 55%);
     style(--theme: 'dark'):        hsl(330, 90%, 75%); 
     style(--theme: 'alternative'): hsl(177, 63%, 72%);
     else: #333333
   );
   --color--primary--active: if(
-    style(--theme: 'light'):       hsl(20, 80%, 27%);
+    style(--theme: 'light'):       hsl(28, 80%, 60%);
     style(--theme: 'dark'):        hsl(330, 90%, 80%); 
     style(--theme: 'alternative'): hsl(177, 63%, 77%); 
     else: #333333
   );
   --color--primary--alpha: if(
-    style(--theme: 'light'):       hsl(20, 80%, 37%, .1);
+    style(--theme: 'light'):       hsl(28, 80%, 37%, .1);
     style(--theme: 'dark'):        hsl(330, 90%, 70%, .1); 
     style(--theme: 'alternative'): hsl(177, 63%, 67%, .1); 
     else: #333333
   );
   --color--outline--primary: if(
-    style(--theme: 'light'):       hsl(20, 80%, 37%, 33%);
+    style(--theme: 'light'):       hsl(28, 80%, 37%, 33%);
     style(--theme: 'dark'):        hsl(330, 90%, 70%, 33%); 
     style(--theme: 'alternative'): hsl(177, 63%, 67%, 33%); 
     else: #333333
   );
   --color--on-primary: if(
-    style(--theme: 'light'):       var(--color--fg-95);
+    style(--theme: 'light'):       var(--color--bg-95);
     style(--theme: 'dark'):        var(--color--fg-85);
     style(--theme: 'alternative'): var(--color--fg-85);
     else: #333333
@@ -542,7 +542,7 @@
   --box-shadow--default: 0px 6px 8px #0000008f;
   --box-shadow--strong: 0px 7px 10px #000000ab;
 
-  --border-radius--default: 4px;
+  --border-radius--default: 8px;
   --border-radius--button: var(--border-radius--default);
   --border-radius--select: var(--border-radius--default);
 
@@ -565,8 +565,8 @@
 
   /* footer height */
   --height--footer: if(
-    /* PHONE */ media(width < 767px):  128px;
-    /* TABLET */media(width < 1280px): 128px;
+    /* PHONE */ media(width < 767px):  0px;
+    /* TABLET */media(width < 1280px): 0px;
     /* LAPTOP */media(width < 1920px): 0px;
     /* DESKTOP */ else:                0px;
   );
