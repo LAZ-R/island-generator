@@ -61,6 +61,7 @@
   pointer-events: none;
   animation: flicker 0.15s infinite;
   z-index: 55;
+  overflow: hidden;
 }
 .crt::before {
   content: " ";
@@ -75,8 +76,10 @@
   background-size: 100% 2px, 3px 100%;
   pointer-events: none;
   z-index: 55;
+  overflow: hidden;
 }
 .crt {
   /* animation: textShadow 1.6s infinite; */
   z-index: 55;
+  overflow: hidden;
 }

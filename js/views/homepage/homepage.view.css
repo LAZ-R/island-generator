@@ -6,249 +6,229 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  min-width: 100cqw; max-width: 100cqw;
-  min-height: 100cqw; max-height: 100cqw;
+  min-width: 100svw; max-width: 100svw;
+  min-height: 100svw; max-height: 100svw;
   padding: 16px;
-}
-
-.main-container {
-  position: relative;
-  display: flex;
-  min-width: 100%; max-width: 100%;
-  min-height: 100%; max-height: 100%;
-  aspect-ratio: 1/1;
-  overflow: hidden;
-  border-radius: 16px;
-  /* border: 16px solid var(--color--bg-html);
-  border-radius: 16px; */
-
-  .map-container {
-    --x-size: 10;
-    background-color: black;
-    position: absolute;
-    top: 0;
-    left: 0;
-    display: flex;
-    justify-content: flex-start;
-    align-items: flex-start;
-    flex-wrap: wrap;
-    min-width: 100%; width: 100%; max-width: 100%;
-    transform-origin: top left;
-    container-type: inline-size;
+  container-type: inline-size;
+  
+  .main-container {
+    position: relative;
+    width: 100cqw;
+    height: 100cqw;
     aspect-ratio: 1/1;
-    border-radius: 16px;
     overflow: hidden;
+    border-radius: 16px;
   
-    .grid-cell {
-      --cell-size: calc(100cqw / var(--x-size));
-      --background-color: if(
-        style(--map-theme: 'realistic'): hsl(227, 33%, 25%);
-        style(--map-theme: 'volcanic'):  hsl(190, 40%, 45%);
-        style(--map-theme: 'fjord'):     hsl(190, 80%, 40%);
-        style(--map-theme: 'mangrove'):  hsl(45, 12%, 45%);
-        else: hsl(200, 80%, 50%)
-      );
+    .map-container,
+    .map-mask,
+    .interactive-panel,
+    .screen-container {
+      position: absolute;
+      inset: 0;
+    }
+  
+    .map-container {
+      --x-size: 10;
+      background-color: black;
       display: flex;
-      position: relative;
-      justify-content: center;
-      align-items: center;
-      aspect-ratio: 1/1;
-      background-color: var(--background-color);
-      min-width: var(--cell-size); width: var(--cell-size); max-width: var(--cell-size);
-      min-height: var(--cell-size); height: var(--cell-size); max-height: var(--cell-size);
-      font-size: 12px;
-      color: transparent;
-      transition: opacity .5s linear;
-  
-      &.island-center {
+      justify-content: flex-start;
+      align-items: flex-start;
+      flex-wrap: wrap;
+      transform-origin: top left;
+      container-type: inline-size;
+      border-radius: 16px;
+      overflow: hidden;
+    
+      .grid-cell {
+        --cell-size: calc(100% / var(--x-size));
         --background-color: if(
-          style(--map-theme: 'realistic'):  hsl(131, 10%, 33%);
-          style(--map-theme: 'volcanic'):  hsl(30, 5%, 30%);
-          style(--map-theme: 'fjord'):   hsl(178, 10%, 98%);
-            style(--map-theme: 'mangrove'):  hsl(122, 33%, 30%);
-          else: hsl(111, 21%, 36%)
+          style(--map-theme: 'realistic'): hsl(227, 33%, 25%);
+          style(--map-theme: 'volcanic'):  hsl(190, 40%, 45%);
+          style(--map-theme: 'fjord'):     hsl(190, 80%, 40%);
+          style(--map-theme: 'mangrove'):  hsl(45, 12%, 45%);
+          else: hsl(200, 80%, 50%)
         );
-  
-        &.spreaded {
+        display: flex;
+        position: relative;
+        justify-content: center;
+        align-items: center;
+        aspect-ratio: 1/1;
+        background-color: var(--background-color);
+        min-width: var(--cell-size); width: var(--cell-size); max-width: var(--cell-size);
+        min-height: var(--cell-size); height: var(--cell-size); max-height: var(--cell-size);
+        font-size: 12px;
+        color: transparent;
+        transition: opacity .5s linear;
+        overflow: hidden;
+    
+        &.island-center {
           --background-color: if(
-            style(--map-theme: 'realistic'):  hsl(139, 12%, 35%);
+            style(--map-theme: 'realistic'):  hsl(131, 10%, 33%);
             style(--map-theme: 'volcanic'):  hsl(30, 5%, 30%);
             style(--map-theme: 'fjord'):   hsl(178, 10%, 98%);
-            style(--map-theme: 'mangrove'):  hsl(122, 33%, 30%);
+              style(--map-theme: 'mangrove'):  hsl(122, 33%, 30%);
             else: hsl(111, 21%, 36%)
           );
+    
+          &.spreaded {
+            --background-color: if(
+              style(--map-theme: 'realistic'):  hsl(139, 12%, 35%);
+              style(--map-theme: 'volcanic'):  hsl(30, 5%, 30%);
+              style(--map-theme: 'fjord'):   hsl(178, 10%, 98%);
+              style(--map-theme: 'mangrove'):  hsl(122, 33%, 30%);
+              else: hsl(111, 21%, 36%)
+            );
+          }
         }
-      }
-  
-      &.surrounding {
-        --background-color: if(
-          style(--map-theme: 'realistic'):  hsl(34, 25%, 55%);
-          style(--map-theme: 'volcanic'):  hsl(30, 5%, 40%);
-          style(--map-theme: 'fjord'):   hsl(178, 60%, 95%);
-          style(--map-theme: 'mangrove'):  hsl(119, 28%, 35%);
-          else: hsl(80, 17%, 56%)
-        );
-      }
-  
-      &.beach {
-        --background-color: if(
-          style(--map-theme: 'realistic'):  hsl(10, 51%, 91%);
-          style(--map-theme: 'volcanic'):  hsl(30, 5%, 50%);
-          style(--map-theme: 'fjord'):   hsl(185, 80%, 80%);
-          style(--map-theme: 'mangrove'):  hsl(40, 25%, 60%);
-          else: hsl(39, 50%, 90%)
-        );
-      }
-  
-      &.water-1 {
-        --background-color: if(
-          style(--map-theme: 'realistic'):  hsl(165, 25%, 69%);
-          style(--map-theme: 'volcanic'):  hsl(190, 30%, 55%);
-          style(--map-theme: 'fjord'):   hsl(185, 80%, 60%);
-          style(--map-theme: 'mangrove'):  hsl(39, 20%, 55%);
-          else: hsl(175, 70%, 70%)
-        );
-      }
-  
-      &.water-2 {
-        --background-color: if(
-          style(--map-theme: 'realistic'):  hsl(197, 48%, 36%);
-          style(--map-theme: 'volcanic'):  hsl(190, 35%, 50%);
-          style(--map-theme: 'fjord'):   hsl(190, 80%, 50%);
-          style(--map-theme: 'mangrove'):  hsl(42, 15%, 50%);
-          else: hsl(190, 80%, 50%)
-        );
-      }
-  
-      /* &.central-point {
-        border: none;
-        background-color: red !important;
-      } */
-  
-      &.hidden-point {
-        border: none;
-        /* background-color: red !important; */
-        &::after {
-          content: '';
-          position: absolute;
-          top: 0;
-          left: 0;
-          min-width: 100%; width: 100%; max-width: 100%;
-          min-height: 100%; height: 100%; max-height: 100%;
-          /* background-color: red; */
-          /* opacity: .2; */
-          transform-origin: center;
-          /* transform: scale(3); */
-          z-index: 50;
+    
+        &.surrounding {
+          --background-color: if(
+            style(--map-theme: 'realistic'):  hsl(34, 25%, 55%);
+            style(--map-theme: 'volcanic'):  hsl(30, 5%, 40%);
+            style(--map-theme: 'fjord'):   hsl(178, 60%, 95%);
+            style(--map-theme: 'mangrove'):  hsl(119, 28%, 35%);
+            else: hsl(80, 17%, 56%)
+          );
+        }
+    
+        &.beach {
+          --background-color: if(
+            style(--map-theme: 'realistic'):  hsl(10, 51%, 91%);
+            style(--map-theme: 'volcanic'):  hsl(30, 5%, 50%);
+            style(--map-theme: 'fjord'):   hsl(185, 80%, 80%);
+            style(--map-theme: 'mangrove'):  hsl(40, 25%, 60%);
+            else: hsl(39, 50%, 90%)
+          );
+        }
+    
+        &.water-1 {
+          --background-color: if(
+            style(--map-theme: 'realistic'):  hsl(165, 25%, 69%);
+            style(--map-theme: 'volcanic'):  hsl(190, 30%, 55%);
+            style(--map-theme: 'fjord'):   hsl(185, 80%, 60%);
+            style(--map-theme: 'mangrove'):  hsl(39, 20%, 55%);
+            else: hsl(175, 70%, 70%)
+          );
+        }
+    
+        &.water-2 {
+          --background-color: if(
+            style(--map-theme: 'realistic'):  hsl(197, 48%, 36%);
+            style(--map-theme: 'volcanic'):  hsl(190, 35%, 50%);
+            style(--map-theme: 'fjord'):   hsl(190, 80%, 50%);
+            style(--map-theme: 'mangrove'):  hsl(42, 15%, 50%);
+            else: hsl(190, 80%, 50%)
+          );
+        }
+    
+        /* &.central-point {
+          background-color: orange !important;
+        } */
+    
+        &.hidden-point {
+          /* background-color: red !important; */
+        }
+
+        img {
+          width: 100%;
+          opacity: .33;
         }
       }
     }
-  }
-
-  .map-mask {
-    position: absolute;
-    background-color: black;
-    display: flex;
-    justify-content: flex-start;
-    align-items: flex-start;
-    flex-wrap: wrap;
-    min-width: 100%; width: 100%; max-width: 100%;
-    min-height: 100%; height: 100%; max-height: 100%;
-    aspect-ratio: 1/1;
-    transition: opacity 1s linear;
-    opacity: 0;
-    border-radius: 16px;
-    overflow: hidden;
-
-    &.hidden {
-      opacity: 1;
-    }
-  }
   
-  .interactive-panel {
-    position: absolute;
-    /* background-color: magenta; */
-    display: flex;
-    justify-content: flex-start;
-    align-items: flex-start;
-    flex-wrap: wrap;
-    min-width: 100%; width: 100%; max-width: 100%;
-    min-height: 100%; height: 100%; max-height: 100%;
-    opacity: .66;
-    aspect-ratio: 1/1;
-    border-radius: 16px;
-    overflow: hidden;
-  
-    .quarter-panel {
-      position: relative;
+    .map-mask {
+      background-color: black;
       display: flex;
-      justify-content: center;
-      align-items: center;
-      min-width: 50%; width: 50%; max-width: 50%;
-      min-height: 50%; height: 50%; max-height: 50%;
-      border: 1px solid black;
+      justify-content: flex-start;
+      align-items: flex-start;
+      transition: opacity 1s linear;
+      opacity: 0;
+      border-radius: 16px;
       overflow: hidden;
+      /* display: none; */
   
-      &.scan {
-        &::after {
-          content: '';
-          position: absolute;
-          top: -100%;
-          left: 0;
-          min-width: 100%; width: 100%; max-width: 100%;
-          min-height: 100%; height: 100%; max-height: 100%;
-          background: linear-gradient(0deg,hsl(28, 100%, 60%) 0%, hsla(28, 100%, 50%, 0.9) 2%, hsla(28, 100%, 50%, 0.8) 8%, hsla(28, 100%, 50%, 0.5) 16%, hsla(28, 100%, 50%, 0.25) 50%, hsla(28, 100%, 50%, 0.1) 100%);
-          /* opacity: .2; */
-          transform-origin: center;
-          /* transform: scale(3); */
-          z-index: 50;
-          animation: scan 2s linear forwards;
-        }
-      }
-
-      &.blacked {
-        &::after {
-          content: '';
-          position: absolute;
-          min-width: 100%; width: 100%; max-width: 100%;
-          min-height: 100%; height: 100%; max-height: 100%;
-          background-color: #000000ad;
-        }
-      }
-  
-      &.win {
-        animation: win 2s linear forwards;
-      }
-  
-      &.fail {
-        animation: fail 2s linear forwards;
-      }
-  
-      &.failed {
-        background-image: linear-gradient(45deg, hsla(0, 0%, 0%, 0.5) 25%, #ffffff00 25%, #ffffff00 50%, hsla(0, 0%, 0%, 0.5) 50%, hsla(0, 0%, 0%, 0.5) 75%, #ffffff00 75%, #ffffff00 100%);
-        background-size: 64px 64px;
+      &.hidden {
+        opacity: 1;
       }
     }
-  }
-
-  .screen-container {
-    position: absolute;
-    top: 0;
-    left: 0;
-    display: flex;
-    min-width: 100%; width: 100%; max-width: 100%;
-    min-height: 100%; height: 100%; max-height: 100%;
-    aspect-ratio: 1/1;
-    border-radius: 25%;
-    overflow: hidden;
-    outline: 50px solid hsl(0, 0%, 5%);
-
-    -webkit-box-shadow: inset 0px 0px 15px 5px #000000; 
-    box-shadow: inset 0px 0px 15px 5px #000000;
-
-    z-index: 70;
+    
+    .interactive-panel {
+      display: flex;
+      justify-content: flex-start;
+      align-items: flex-start;
+      flex-wrap: wrap;
+      opacity: .66;
+      border-radius: 16px;
+      overflow: hidden;
+      /* display: none; */
+    
+      .quarter-panel {
+        position: relative;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-width: 50%; width: 50%; max-width: 50%;
+        min-height: 50%; height: 50%; max-height: 50%;
+        border: 1px solid black;
+        overflow: hidden;
+    
+        &.scan {
+          &::after {
+            content: '';
+            position: absolute;
+            top: -100%;
+            left: 0;
+            min-width: 100%; width: 100%; max-width: 100%;
+            min-height: 100%; height: 100%; max-height: 100%;
+            background: linear-gradient(0deg,hsl(28, 100%, 60%) 0%, hsla(28, 100%, 50%, 0.9) 2%, hsla(28, 100%, 50%, 0.8) 8%, hsla(28, 100%, 50%, 0.5) 16%, hsla(28, 100%, 50%, 0.25) 50%, hsla(28, 100%, 50%, 0.1) 100%);
+            /* opacity: .2; */
+            transform-origin: center;
+            /* transform: scale(3); */
+            z-index: 50;
+            animation: scan 2s linear forwards;
+          }
+        }
+  
+        &.blacked {
+          &::after {
+            content: '';
+            position: absolute;
+            min-width: 100%; width: 100%; max-width: 100%;
+            min-height: 100%; height: 100%; max-height: 100%;
+            background-color: #000000ad;
+          }
+        }
+    
+        &.win {
+          animation: win 2s linear forwards;
+        }
+    
+        &.fail {
+          animation: fail 2s linear forwards;
+        }
+    
+        &.failed {
+          background-image: linear-gradient(45deg, hsla(0, 0%, 0%, 0.5) 25%, #ffffff00 25%, #ffffff00 50%, hsla(0, 0%, 0%, 0.5) 50%, hsla(0, 0%, 0%, 0.5) 75%, #ffffff00 75%, #ffffff00 100%);
+          background-size: 59px 59px;
+        }
+      }
+    }
+  
+    .screen-container {
+      display: flex;
+      border-radius: 25%;
+      overflow: hidden;
+      outline: 50px solid hsl(0, 0%, 5%);
+      /* display: none; */
+  
+      -webkit-box-shadow: inset 0px 0px 15px 5px #000000; 
+      box-shadow: inset 0px 0px 15px 5px #000000;
+  
+      z-index: 70;
+    }
   }
 }
+
 @keyframes scan {
   0%   { top: -100%; }
   100% { top: 0%; }
@@ -276,15 +256,21 @@
   padding-top: 0 !important;
 }
 
-.top-info-area {
+.zoom-pill {
   display: flex;
   min-width: 100%;
   justify-content: space-between;
   align-items: center;
-  padding: 8px;
+  background-color: var(--color--fg-default);
+  color: grey;
+  padding: 8px 16px;
   border-radius: var(--border-radius--default);
-  border: 1px solid var(--color--fg-default);
-  opacity: .33;
+  overflow: hidden;
+
+  .selected {
+    color: hsl(180, 100%, 75%);
+    text-shadow: 0 0 2px hsla(180, 100%, 50%, .9), 0 0 4px hsla(180, 100%, 50%, .8), 0 0 8px hsla(180, 100%, 50%, .7), 0 0 16px hsla(190, 100%, 50%, .6), 0 0 20px hsla(200, 100%, 50%, .5), 0 0 30px hsla(210, 100%, 50%, .4), 0 0 40px hsla(220, 100%, 50%, .3)
+  }
 }
 
 .controls-container {
@@ -348,6 +334,16 @@
   width: 100%;
   /* background-color: magenta; */
 
+  .info-area {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px;
+    border-radius: var(--border-radius--default);
+    border: 1px solid var(--color--fg-default);
+    opacity: .33;
+  }
+
   .speaker {
     --size: 96px;
     --line-weight: calc(var(--size) / 11);
@@ -366,6 +362,7 @@
       -webkit-box-shadow: inset 0px 4px 5px 1px rgba(0,0,0,0.3); 
       box-shadow: inset 0px 4px 5px 1px rgba(0,0,0,0.3);
       border-radius: 500px;
+      background-color: hsl(0, 0%, 85%);
 
       &.large {
         min-height: 100%; height: 100%; max-height: 100%;
@@ -380,6 +377,16 @@
   }
 }
 
+.inner-body {
+  background-color: white;
+}
+
+.top-info-area {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  width: 100%;
+}
 
 .lines-container {
   display: flex;

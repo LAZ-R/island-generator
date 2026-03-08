@@ -1,6 +1,5 @@
 import { APP_NAME, APP_VERSION } from "../../../app-properties.js";
 import { playMusic } from "../../services/music.service.js";
-import { POKEMONS_LIST } from "../../data/pokemons.data.js";
 import { ICONS } from "../../data/svgIcons.data.js";
 import { APP_BASE_PATH, APP_ORIGIN, toExternalPath } from "../../router.js";
 import { getSvgIcon } from "../../services/icons.service.js";
@@ -9,6 +8,8 @@ import { getUser } from "../../services/storage.service.js";
 import { showToast } from "../../services/toast.service.js";
 import { isLaptopOrUp, isPhone, isTablet } from "../../utils/breakpoints.js";
 import { getRandomIntegerBetween } from "../../utils/math.utils.js";
+import { CURRENT_PRESET, CURRENT_ZOOM, getQuarterBounds, initNewMap, isHiddenPointInBounds, setPreset, zoomToQuarter } from "../../services/island-map.service.js";
+import { PRESETS } from "../../data/island-presets.data.js";
 
 // VARIABLES //////////////////////////////////////////////////////////////////////////////////////
 const HEADER_ICON_CONTAINER = document.getElementById('headerIconContainer');
@@ -16,153 +17,12 @@ const HEADER_TITLE = document.getElementById('headerTitle');
 const MAIN = document.getElementById('main');
 const FOOTER = document.getElementById('footer');
 
-let MAIN_WIDTH = MAIN.getBoundingClientRect().width;
-
-const X_SIZE = 128;//Math.round(MAIN_WIDTH / 6);
-const Y_SIZE = 128;//86//Math.round(MAIN_WIDTH / 4.5);
-
-const PRESETS = [
-  // DEFAULT
-  {
-    id: 'default',
-    name: 'Default',
-    islandCount: 12,
-    centerSpread: 32,
-    centerSpreadProbability: 16,
-    surroundingsSpread: 4 * 2,
-    surroundingsSpreadProbability: 8,
-    beachSpread: 2 * 2,
-    beachSpreadProbability: 8,
-    water1Spread: 2 * 2,
-    water1SpreadProbability: 16,
-    water2Spread: 6 * 2,
-    water2SpreadProbability: 16,
-  },
-  // archipel réaliste
-  {
-    id: 'realistic',
-    name: 'Realistic',
-    islandCount: 6,
-    centerSpread: 26 * 2,
-    centerSpreadProbability: 19,
-    surroundingsSpread: 6 * 2,
-    surroundingsSpreadProbability: 12,
-    beachSpread: 1 * 2,
-    beachSpreadProbability: 28,
-    water1Spread: 5 * 2,
-    water1SpreadProbability: 20,
-    water2Spread: 10 * 2,
-    water2SpreadProbability: 11,
-  },
-  // tropical islands
-  {
-    id: 'tropical',
-    name: 'Tropical islands',
-    islandCount: 14,
-    centerSpread: 14 * 2,
-    centerSpreadProbability: 17,
-    surroundingsSpread: 3 * 2,
-    surroundingsSpreadProbability: 10,
-    beachSpread: 2 * 2,
-    beachSpreadProbability: 40,
-    water1Spread: 6 * 2,
-    water1SpreadProbability: 25,
-    water2Spread: 10 * 2,
-    water2SpreadProbability: 18,
-  },
-  // volcanic islands
-  {
-    id: 'volcanic',
-    name: 'Volcanic islands',
-    islandCount: 4,
-    centerSpread: 30 * 2,
-    centerSpreadProbability: 20,
-    surroundingsSpread: 4 * 2,
-    surroundingsSpreadProbability: 10,
-    beachSpread: 1 * 2,
-    beachSpreadProbability: 25,
-    water1Spread: 3 * 2,
-    water1SpreadProbability: 20,
-    water2Spread: 10 * 2,
-    water2SpreadProbability: 14,
-  },
-  // fjord islands
-  {
-    id: 'fjord',
-    name: 'Fjords',
-    islandCount: 6,
-    centerSpread: 26 * 2,
-    centerSpreadProbability: 14,
-    surroundingsSpread: 7 * 2,
-    surroundingsSpreadProbability: 10,
-    beachSpread: 1 * 2,
-    beachSpreadProbability: 20,
-    water1Spread: 6 * 2,
-    water1SpreadProbability: 30,
-    water2Spread: 12 * 2,
-    water2SpreadProbability: 15,
-  },
-  {
-    id: 'continent',
-    name: 'Continent',
-    islandCount: 3,
-    centerSpread: 36 * 2,
-    centerSpreadProbability: 22,
-    surroundingsSpread: 6 * 2,
-    surroundingsSpreadProbability: 12,
-    beachSpread: 1 * 2,
-    beachSpreadProbability: 16,
-    water1Spread: 2 * 2,
-    water1SpreadProbability: 6,
-    water2Spread: 8 * 2,
-    water2SpreadProbability: 12,
-  },
-  {
-    id: 'coral-hell',
-    name: 'Coral hell',
-    islandCount: 16,
-    centerSpread: 8 * 2,
-    centerSpreadProbability: 2,
-    surroundingsSpread: 6 * 2,
-    surroundingsSpreadProbability: 3,
-    beachSpread: 4 * 2,
-    beachSpreadProbability: 8,
-    water1Spread: 4 * 2,
-    water1SpreadProbability: 8,
-    water2Spread: 12 * 2,
-    water2SpreadProbability: 8,
-  },
-  {
-    id: 'mangrove',
-    name: 'Mangrove delta',
-    islandCount: 24,
-    centerSpread: 2 * 2,
-    centerSpreadProbability: 2,
-    surroundingsSpread: 12 * 2,
-    surroundingsSpreadProbability: 12,
-    beachSpread: 4 * 2,
-    beachSpreadProbability: 10,
-    water1Spread: 6 * 2,
-    water1SpreadProbability: 6,
-    water2Spread: 12 * 2,
-    water2SpreadProbability: 14,
-  },
-];
-
-let CURRENT_PRESET = {};
-
-let CURRENT_ZOOM = 1;
-let CENTER_X = 0.5;
-let CENTER_Y = 0.5;
-
-let CURRENT_QUARTER = null;
+let CURRENT_SELECTED_QUARTER = null;
 let FAILED_QUARTERS = 0;
 
 // FUNCTIONS //////////////////////////////////////////////////////////////////////////////////////
 
 export function render() {
-
-  //let user = getUser();
   // Set HEADER layout
   if (isPhone || isTablet) {
     HEADER_TITLE.innerHTML = '';
@@ -170,6 +30,7 @@ export function render() {
   if (isLaptopOrUp) {
     HEADER_TITLE.innerHTML = APP_NAME;
   }
+
 
   // Set MAIN layout
   MAIN.innerHTML = `
@@ -189,7 +50,15 @@ export function render() {
 
   <div class="page-container">
 
-    <div class="top-info-area lzr-margin-bottom">Scanotron 3000&copy
+    <div class="zoom-pill lzr-margin-bottom">
+      <span id="zoom1"   class="zoom-label selected">x1</span>
+      <span id="zoom2"   class="zoom-label">x2</span>
+      <span id="zoom4"   class="zoom-label">x4</span>
+      <span id="zoom8"   class="zoom-label">x8</span>
+      <span id="zoom16"  class="zoom-label">x16</span>
+      <span id="zoom32"  class="zoom-label">x32</span>
+      <span id="zoom64"  class="zoom-label">x64</span>
+      <span id="zoom128" class="zoom-label">x128</span>
     </div>
 
     <div class="controls-container lzr-margin-bottom">
@@ -205,8 +74,8 @@ export function render() {
     </div>
 
     <div class="bottom-area">
-      <div class="credits">
-        <p>on verra bien quoi mettre<br>d'autre comme infos</p>
+      <div class="info-area">
+        Scanotron 3000 &copy
       </div>
       <div class="speaker">
         <div class="speaker-line small"></div>
@@ -354,10 +223,7 @@ export function render() {
     </div>
   `;
 
-
   updateMenuDom('homepage');
-  //setupGrid();
-  CURRENT_PRESET = {...PRESETS[0]};
   updateValues();
 
   setTimeout(() => {
@@ -366,118 +232,48 @@ export function render() {
 
 }
 
-function getQuarterCells(vertical, horizontal) {
-  // 1) Taille de la zone actuellement visible dans la grille
-  // Exemple sur une grille 128 :
-  // zoom 1 => 128 cellules visibles
-  // zoom 2 => 64 cellules visibles
-  // zoom 4 => 32 cellules visibles
-  const visibleWidthInCells = X_SIZE / CURRENT_ZOOM;
-  const visibleHeightInCells = Y_SIZE / CURRENT_ZOOM;
-
-  // 2) Bornes de la zone visible actuelle, en coordonnées relatives [0..1]
-  const visibleLeftRel = CENTER_X - (1 / CURRENT_ZOOM) / 2;
-  const visibleTopRel = CENTER_Y - (1 / CURRENT_ZOOM) / 2;
-
-  // 3) Conversion en indices de cellules (1-based, inclusifs)
-  // Exemple au départ :
-  // left = 0, top = 0 => x: 1..128, y: 1..128
-  const visibleStartX = Math.round(visibleLeftRel * X_SIZE) + 1;
-  const visibleStartY = Math.round(visibleTopRel * Y_SIZE) + 1;
-
-  const visibleEndX = visibleStartX + visibleWidthInCells - 1;
-  const visibleEndY = visibleStartY + visibleHeightInCells - 1;
-
-  // 4) Découpage symétrique de la zone visible en 2 moitiés
-  const halfWidth = visibleWidthInCells / 2;
-  const halfHeight = visibleHeightInCells / 2;
-
-  // X
-  let quarterStartX;
-  let quarterEndX;
-
-  if (horizontal === 'left') {
-    quarterStartX = visibleStartX;
-    quarterEndX = visibleStartX + halfWidth - 1;
-  } else {
-    quarterStartX = visibleStartX + halfWidth;
-    quarterEndX = visibleEndX;
-  }
-
-  // Y
-  let quarterStartY;
-  let quarterEndY;
-
-  if (vertical === 'top') {
-    quarterStartY = visibleStartY;
-    quarterEndY = visibleStartY + halfHeight - 1;
-  } else {
-    quarterStartY = visibleStartY + halfHeight;
-    quarterEndY = visibleEndY;
-  }
-
-  // 5) Construction du tableau de toutes les cellules du quarter
-  // Format : "x-y"
-  const cells = [];
-
-  for (let y = quarterStartY; y <= quarterEndY; y++) {
-    for (let x = quarterStartX; x <= quarterEndX; x++) {
-      cells.push(`${x}-${y}`);
-    }
-  }
-
-  return cells;
-}
-
-function applyMapTransform() {
-  const mapElement = document.getElementById('mapContainer');
-  const translateX = (0.5 - CENTER_X * CURRENT_ZOOM) * 100;
-  const translateY = (0.5 - CENTER_Y * CURRENT_ZOOM) * 100;
-
-  mapElement.style.transform =
-    `translate(${translateX}%, ${translateY}%) scale(${CURRENT_ZOOM})`;
-}
 
 function onQuarterSelect(vertical, horizontal) {
   //console.log(vertical, horizontal);
-  if (CURRENT_QUARTER == `${vertical}_${horizontal}`) {
-    CURRENT_QUARTER = null;
+  if (CURRENT_SELECTED_QUARTER == `${vertical}_${horizontal}`) {
+    CURRENT_SELECTED_QUARTER = null;
   } else {
-    CURRENT_QUARTER = `${vertical}_${horizontal}`;
+    CURRENT_SELECTED_QUARTER = `${vertical}_${horizontal}`;
   }
 
   let quarters = document.getElementsByClassName('quarter-panel');
   for (let quarter of quarters) {
-    if (CURRENT_QUARTER == null) {
+    if (CURRENT_SELECTED_QUARTER == null) {
       quarter.classList.remove('blacked');
     } else {
-      quarter.classList.toggle('blacked', quarter.id != `${CURRENT_QUARTER}_panel`);
+      quarter.classList.toggle('blacked', quarter.id != `${CURRENT_SELECTED_QUARTER}_panel`);
     }
   }
 
   let buttons = document.getElementsByClassName('quarter-button');
   for (let button of buttons) {
-    button.classList.toggle('lzr-solid',button.id != `${CURRENT_QUARTER}_button`);
+    button.classList.toggle('lzr-solid',button.id != `${CURRENT_SELECTED_QUARTER}_button`);
   }
     
-  document.getElementById('scan_button').classList.toggle('lzr-primary', CURRENT_QUARTER != null);
-  document.getElementById('scan_button').classList.toggle('lzr-solid', CURRENT_QUARTER != null);
+  document.getElementById('scan_button').classList.toggle('lzr-primary', CURRENT_SELECTED_QUARTER != null);
+  document.getElementById('scan_button').classList.toggle('lzr-solid', CURRENT_SELECTED_QUARTER != null);
 }
 window.onQuarterSelect = onQuarterSelect;
 
-function resetSelection() {
-  CURRENT_QUARTER = null;
+
+function resetQuarterSelection() {
+  CURRENT_SELECTED_QUARTER = null;
   let buttons = document.getElementsByClassName('quarter-button');
   for (let button of buttons) {
-    button.classList.toggle('lzr-solid',button.id != `${CURRENT_QUARTER}_button`);
+    button.classList.toggle('lzr-solid',button.id != `${CURRENT_SELECTED_QUARTER}_button`);
   }
     
-  document.getElementById('scan_button').classList.toggle('lzr-primary', CURRENT_QUARTER != null);
-  document.getElementById('scan_button').classList.toggle('lzr-solid', CURRENT_QUARTER != null);
+  document.getElementById('scan_button').classList.toggle('lzr-primary', CURRENT_SELECTED_QUARTER != null);
+  document.getElementById('scan_button').classList.toggle('lzr-solid', CURRENT_SELECTED_QUARTER != null);
 }
 
 function onScanClick() {
-  if (CURRENT_QUARTER == null) return;
+  if (CURRENT_SELECTED_QUARTER == null) return;
 
   let quarters = document.getElementsByClassName('quarter-panel');
   for (let quarter of quarters) {
@@ -490,8 +286,9 @@ function onScanClick() {
 }
 window.onScanClick = onScanClick;
 
+
 function scanQuarter(vertical, horizontal) {
-  if (CURRENT_ZOOM >= 128) return;
+  if (CURRENT_ZOOM > 128) return;
 
   // Scaning animation
   let quarterElement = document.getElementById(`${vertical}_${horizontal}_panel`);
@@ -499,14 +296,15 @@ function scanQuarter(vertical, horizontal) {
 
   setTimeout(() => {
     quarterElement.classList.remove('scan');
+
     // Check condition =========================================================
-    const quarterCells = getQuarterCells(vertical, horizontal);
-    //console.log('nb cellules:', quarterCells.length);
+    const quarterBounds = getQuarterBounds(vertical, horizontal);
+    const hasHiddenPoint = isHiddenPointInBounds(quarterBounds);
   
     const hiddenPointCellElement = document.getElementsByClassName('hidden-point')[0];
     const hiddenPointId = hiddenPointCellElement.id;
   
-    if (quarterCells.indexOf(hiddenPointId) != -1) {
+    if (hasHiddenPoint) {
       quarterElement.classList.add('win');
 
       setTimeout(() => {
@@ -518,32 +316,26 @@ function scanQuarter(vertical, horizontal) {
         }
 
         if (CURRENT_ZOOM < 64) {
-          // MAP TRANSFORM
-        
-          const step = 1 / (4 * CURRENT_ZOOM);
-        
-          if (horizontal === 'left') {
-            CENTER_X -= step;
-          } else {
-            CENTER_X += step;
-          }
-        
-          if (vertical === 'top') {
-            CENTER_Y -= step;
-          } else {
-            CENTER_Y += step;
-          }
-        
-          CURRENT_ZOOM *= 2;
-        
-          applyMapTransform();
+          zoomToQuarter(vertical, horizontal);
           FAILED_QUARTERS = 0;
-        
-          //console.log(`current zoom: ${CURRENT_ZOOM}`);
+          console.log(`current zoom: ${CURRENT_ZOOM}`);
+          const zoomLevelsDom = document.getElementsByClassName('zoom-label');
+          for (let zoomLevelDom of zoomLevelsDom) {
+            zoomLevelDom.classList.toggle('selected', zoomLevelDom.id == `zoom${CURRENT_ZOOM}`);
+          }
         } else {
-          onGenerateClick();
+          // FINAL WIN
+          zoomToQuarter(vertical, horizontal);
+          FAILED_QUARTERS = 0;
+          console.log(`current zoom: ${CURRENT_ZOOM}`);
+          const zoomLevelsDom = document.getElementsByClassName('zoom-label');
+          for (let zoomLevelDom of zoomLevelsDom) {
+            zoomLevelDom.classList.toggle('selected', zoomLevelDom.id == `zoom${CURRENT_ZOOM}`);
+          }
+          setTimeout(() => {
+            onGenerateClick();
+          }, 2000);
         }
-        
       }, 600);
   
     } else {
@@ -554,6 +346,7 @@ function scanQuarter(vertical, horizontal) {
 
       quarterElement.classList.add('failed');
       FAILED_QUARTERS += 1;
+
       if (FAILED_QUARTERS == 3) {
         setTimeout(() => {
           document.getElementById('mapMask').classList.add('hidden');
@@ -562,13 +355,9 @@ function scanQuarter(vertical, horizontal) {
           }, 1000);
         }, 500);
       }
-      /* setTimeout(() => {
-        quarterElement.classList.replace('fail', 'failed');
-      }, 600); */
-      // ...
     }
 
-    resetSelection();
+    resetQuarterSelection();
     
   }, 2200);
 
@@ -577,6 +366,29 @@ function scanQuarter(vertical, horizontal) {
 
 }
 window.scanQuarter = scanQuarter;
+
+
+
+function onGenerateClick() {
+  // RESET
+  FAILED_QUARTERS = 0;
+  let quarters = document.getElementsByClassName('quarter-panel');
+  for (let quarter of quarters) {
+    quarter.classList.remove('failed');
+    quarter.classList.remove('win');
+  }
+
+  // GENERATE NEW
+  initNewMap();
+  const zoomLevelsDom = document.getElementsByClassName('zoom-label');
+  for (let zoomLevelDom of zoomLevelsDom) {
+    zoomLevelDom.classList.toggle('selected', zoomLevelDom.id == `zoom${CURRENT_ZOOM}`);
+  }
+  document.getElementById('mapMask').classList.remove('hidden');
+}
+window.onGenerateClick = onGenerateClick;
+
+// FONCTIONS SPECIFIQUE CONFIGURATION, à ne pas toucher pour le moment
 
 function getPresetSelectDom() {
   let str = `
@@ -595,7 +407,7 @@ function getPresetSelectDom() {
 function onSelectChange(event) {
   console.log(event.target.value);
   let preset = PRESETS.find((e) => e.id == event.target.value);
-  CURRENT_PRESET = {...preset};
+  setPreset(preset);
   updateValues();
   document.getElementsByClassName('lzr')[0].style = `
     --map-theme: '${preset.id}';
@@ -687,456 +499,3 @@ function onPlusClick(categ, type) {
 }
 window.onPlusClick = onPlusClick;
 
-function setupGrid() {
-  CURRENT_ZOOM = 1;
-  CENTER_X = 0.5;
-  CENTER_Y = 0.5;
-
-  let x_coord = 0;
-  let y_coord = 0;
-
-  let containerElement = document.getElementById('mapContainer');
-  containerElement.innerHTML = '';
-  containerElement.style = '';
-  let str = '';
-
-  // Ligne
-  for (let index = 0; index < Y_SIZE; index++) {
-    x_coord = 0;
-    y_coord += 1;
-
-    // Colonne
-    for (let index = 0; index < X_SIZE; index++) {
-    x_coord += 1;
-      str += `<div id="${x_coord}-${y_coord}" class="grid-cell" style="--x-size: ${X_SIZE};">${x_coord}-${y_coord}</div>`;
-    }
-  }
-
-  containerElement.innerHTML = str;
-}
-
-function getCellSurroundingCells(xCoord, yCoord) {
-  // Contour du rnd initial
-
-  // top left
-  let topLeft = null;
-  if (xCoord > 1 && yCoord > 1) topLeft = `${xCoord - 1}-${yCoord - 1}`;
-
-  // top
-  let top = null;
-  if (yCoord > 1) top = `${xCoord}-${yCoord - 1}`;
-
-  // top right
-  let topRight = null;
-  if (xCoord < X_SIZE && yCoord > 1) topRight = `${xCoord + 1}-${yCoord - 1}`;
-
-  // Left
-  let left = null;
-  if (xCoord > 1) left = `${xCoord - 1}-${yCoord}`;
-
-  // Right
-  let right = null;
-  if (xCoord < X_SIZE) right = `${xCoord + 1}-${yCoord}`;
-
-  // bottom left
-  let bottomLeft = null;
-  if (xCoord > 1 && yCoord < Y_SIZE) bottomLeft = `${xCoord - 1}-${yCoord + 1}`;
-
-  // bottom
-  let bottom = null;
-  if (yCoord < Y_SIZE) bottom = `${xCoord}-${yCoord + 1}`;
-
-  // bottom right
-  let bottomRight = null;
-  if (xCoord < X_SIZE && yCoord < Y_SIZE) bottomRight = `${xCoord + 1}-${yCoord + 1}`;
-
-
-  let surroundings = [
-    topLeft, top, topRight,
-    left, right,
-    bottomLeft, bottom, bottomRight,
-  ];
-
-  return surroundings;
-}
-
-function getCellCrossCells(xCoord, yCoord) {
-
-  // top
-  let top = null;
-  if (yCoord > 1) top = `${xCoord}-${yCoord - 1}`;
-
-  // Left
-  let left = null;
-  if (xCoord > 1) left = `${xCoord - 1}-${yCoord}`;
-
-  // Right
-  let right = null;
-  if (xCoord < X_SIZE) right = `${xCoord + 1}-${yCoord}`;
-
-  // bottom
-  let bottom = null;
-  if (yCoord < Y_SIZE) bottom = `${xCoord}-${yCoord + 1}`;
-
-
-  let surroundings = [
-    top,
-    left, right,
-    bottom,
-  ];
-
-  return surroundings;
-}
-
-function generateMap() {
-  console.log(`
-X_SIZE: ${X_SIZE}
-Y_SIZE: ${Y_SIZE}
-
-Island Count: ${CURRENT_PRESET.islandCount}
-Center Spread: ${CURRENT_PRESET.centerSpread} - ${CURRENT_PRESET.centerSpreadProbability}%
-Surroundings Spread: ${CURRENT_PRESET.surroundingsSpread} - ${CURRENT_PRESET.surroundingsSpreadProbability}%
-Beach Spread: ${CURRENT_PRESET.beachSpread} - ${CURRENT_PRESET.beachSpreadProbability}%
-Water1 Spread: ${CURRENT_PRESET.water1Spread} - ${CURRENT_PRESET.water1SpreadProbability}%
-Water2 Spread: ${CURRENT_PRESET.water2Spread} - ${CURRENT_PRESET.water2SpreadProbability}%
-`);
-  // ISLANDS CENTAL POINTS ********************************************************************************************
-  for (let index = 0; index < CURRENT_PRESET.islandCount; index++) {
-    // Centre de l'île 0
-    let rndX = getRandomIntegerBetween(Math.round(X_SIZE * .15), Math.round(X_SIZE * .85));
-    let rndY = getRandomIntegerBetween(Math.round(Y_SIZE * .15), Math.round(Y_SIZE * .85));
-  
-    let rndCellId = `${rndX}-${rndY}`;
-    let rndCellElement = document.getElementById(rndCellId);
-  
-    rndCellElement.classList.add('island-center');
-    rndCellElement.classList.add('central-point');
-  }
-
-  // ISLAND CENTRAL BASE **********************************************************************************************
-
-  // Island center batch 1
-  let islandCentralElements0 = Array.from(document.getElementsByClassName('island-center'));
-  for (let islandCentralElement of islandCentralElements0) {
-    let elementXCoord = islandCentralElement.id.split('-')[0];
-    let elementYCoord = islandCentralElement.id.split('-')[1];
-    //console.log(`${elementXCoord}-${elementYCoord}`);
-    let elementSurroundings = getCellSurroundingCells(Number(elementXCoord), Number(elementYCoord));
-    for (let elementSurrounding of elementSurroundings) {
-      if (elementSurrounding != null) {
-        let element = document.getElementById(elementSurrounding);
-        if (!element.classList.contains('island-center')) {
-          let rnd = getRandomIntegerBetween(0, 100);
-          if (rnd < 50) {
-            element.classList.add('island-center');
-          }
-        }
-      }
-    }
-  }
-
-  // Island center batch 2
-
-  // Récupération de tous les "island-center" actuels
-  let islandCentralElements1 = Array.from(document.getElementsByClassName('island-center'));
-
-  for (let islandCentralElement of islandCentralElements1) {
-    let elementXCoord = islandCentralElement.id.split('-')[0];
-    let elementYCoord = islandCentralElement.id.split('-')[1];
-    //console.log(`${elementXCoord}-${elementYCoord}`);
-    let elementSurroundings = getCellSurroundingCells(Number(elementXCoord), Number(elementYCoord));
-    for (let elementSurrounding of elementSurroundings) {
-      if (elementSurrounding != null) {
-        let element = document.getElementById(elementSurrounding);
-        if (!element.classList.contains('island-center')) {
-          let rnd = getRandomIntegerBetween(0, 100);
-          if (rnd < 50) {
-            //element.classList.add('surrounding');
-            element.classList.add('island-center');
-          }
-        }
-      }
-    }
-  }
-
-  // Island center batch 3
-
-  // Récupération de tous les "island-center" actuels
-  let islandCentralElements2 = Array.from(document.getElementsByClassName('island-center'));
-
-  for (let islandCentralElement of islandCentralElements2) {
-    let elementXCoord = islandCentralElement.id.split('-')[0];
-    let elementYCoord = islandCentralElement.id.split('-')[1];
-    //console.log(`${elementXCoord}-${elementYCoord}`);
-    let elementSurroundings = getCellSurroundingCells(Number(elementXCoord), Number(elementYCoord));
-    for (let elementSurrounding of elementSurroundings) {
-      if (elementSurrounding != null) {
-        let element = document.getElementById(elementSurrounding);
-        if (!element.classList.contains('island-center')) {
-          let rnd = getRandomIntegerBetween(0, 100);
-          if (rnd < 50) {
-            //element.classList.add('surrounding');
-            element.classList.add('island-center');
-          }
-        }
-      }
-    }
-  }
-
-  // SPREAD -------------------------------------------------------------------
-
-  for (let index = 0; index < CURRENT_PRESET.centerSpread; index++) {
-    let islandCentralElements3 = Array.from(document.getElementsByClassName('island-center'));
-
-    for (let islandCentralElement of islandCentralElements3) {
-      let elementXCoord = islandCentralElement.id.split('-')[0];
-      let elementYCoord = islandCentralElement.id.split('-')[1];
-      //console.log(`${elementXCoord}-${elementYCoord}`);
-      let elementSurroundings = getCellCrossCells(Number(elementXCoord), Number(elementYCoord));
-      for (let elementSurrounding of elementSurroundings) {
-        if (elementSurrounding != null) {
-          let element = document.getElementById(elementSurrounding);
-          if (!element.classList.contains('island-center')) {
-            let rnd = getRandomIntegerBetween(0, 100);
-            if (rnd < CURRENT_PRESET.centerSpreadProbability) {
-              //element.classList.add('surrounding');
-              element.classList.add('island-center');
-              element.classList.add('spreaded');
-            }
-          }
-        }
-      }
-    }
-  }
-
-  // ISLAND SURROUNDINGS **********************************************************************************************
-
-  // Island Surroundings batch 1
-
-  // Récupération de tous les "island-center" actuels
-  let islandCentralElementsFinal = Array.from(document.getElementsByClassName('island-center'));
-
-  for (let islandCentralElement of islandCentralElementsFinal) {
-    let elementXCoord = islandCentralElement.id.split('-')[0];
-    let elementYCoord = islandCentralElement.id.split('-')[1];
-    //console.log(`${elementXCoord}-${elementYCoord}`);
-    let elementSurroundings = getCellCrossCells(Number(elementXCoord), Number(elementYCoord));
-    for (let elementSurrounding of elementSurroundings) {
-      if (elementSurrounding != null) {
-        let element = document.getElementById(elementSurrounding);
-        if (!element.classList.contains('island-center') && !element.classList.contains('surrounding')) {
-          element.classList.add('surrounding');
-        }
-      }
-    }
-  }
-
-  // SPREAD -------------------------------------------------------------------
-
-  for (let index = 0; index < CURRENT_PRESET.surroundingsSpread; index++) {
-    let islandSurroundingElements = Array.from(document.getElementsByClassName('surrounding'));
-
-    for (let islandSurroundingElement of islandSurroundingElements) {
-      let elementXCoord = islandSurroundingElement.id.split('-')[0];
-      let elementYCoord = islandSurroundingElement.id.split('-')[1];
-      //console.log(`${elementXCoord}-${elementYCoord}`);
-      let elementSurroundings = getCellCrossCells(Number(elementXCoord), Number(elementYCoord));
-      for (let elementSurrounding of elementSurroundings) {
-        if (elementSurrounding != null) {
-          let element = document.getElementById(elementSurrounding);
-          if (!element.classList.contains('island-center') && !element.classList.contains('surrounding')) {
-            let rnd = getRandomIntegerBetween(0, 100);
-            if (rnd < CURRENT_PRESET.surroundingsSpreadProbability) {
-              element.classList.add('surrounding');
-            }
-          }
-        }
-      }
-    }
-  }
-
-  // ISLAND BEACHES ***************************************************************************************************
-
-  // Island Beach batch 1
-
-  // Récupération de tous les "island-center" actuels
-  let islandSurroundingElements = Array.from(document.getElementsByClassName('surrounding'));
-
-  for (let islandSurroundingElement of islandSurroundingElements) {
-    let elementXCoord = islandSurroundingElement.id.split('-')[0];
-    let elementYCoord = islandSurroundingElement.id.split('-')[1];
-    //console.log(`${elementXCoord}-${elementYCoord}`);
-    let elementBeaches = getCellCrossCells(Number(elementXCoord), Number(elementYCoord));
-    for (let elementBeach of elementBeaches) {
-      if (elementBeach != null) {
-        let element = document.getElementById(elementBeach);
-        if (!element.classList.contains('island-center') && !element.classList.contains('surrounding') && !element.classList.contains('beach')) {
-          let rnd = getRandomIntegerBetween(0, 100);
-          element.classList.add('beach');
-        }
-      }
-    }
-  }
-
-  // SPREAD -------------------------------------------------------------------
-
-  for (let index = 0; index < CURRENT_PRESET.beachSpread; index++) {    
-    let islandBeachElements = Array.from(document.getElementsByClassName('beach'));
-    for (let islandSurroundingElement of islandBeachElements) {
-      let elementXCoord = islandSurroundingElement.id.split('-')[0];
-      let elementYCoord = islandSurroundingElement.id.split('-')[1];
-      //console.log(`${elementXCoord}-${elementYCoord}`);
-      let elementBeaches = getCellSurroundingCells(Number(elementXCoord), Number(elementYCoord));
-      for (let elementBeach of elementBeaches) {
-        if (elementBeach != null) {
-          let element = document.getElementById(elementBeach);
-          if (!element.classList.contains('island-center') 
-            && !element.classList.contains('surrounding') 
-            && !element.classList.contains('beach')) {
-            let rnd = getRandomIntegerBetween(0, 100);
-            if (rnd < CURRENT_PRESET.beachSpreadProbability) {
-              element.classList.add('beach');
-            }
-          }
-        }
-      }
-    }
-  }
-
-  // ISLAND WATER 1 ***************************************************************************************************
-
-  // Island Water 1 batch 1
-
-  let islandBeachElements2 = Array.from(document.getElementsByClassName('beach'));
-
-  for (let islandBeachElement of islandBeachElements2) {
-    let elementXCoord = islandBeachElement.id.split('-')[0];
-    let elementYCoord = islandBeachElement.id.split('-')[1];
-    //console.log(`${elementXCoord}-${elementYCoord}`);
-    let elementWaters = getCellSurroundingCells(Number(elementXCoord), Number(elementYCoord));
-    for (let elementWater of elementWaters) {
-      if (elementWater != null) {
-        let element = document.getElementById(elementWater);
-        if (!element.classList.contains('island-center') 
-          && !element.classList.contains('surrounding') 
-          && !element.classList.contains('beach') 
-          && !element.classList.contains('water-1')) {
-          let rnd = getRandomIntegerBetween(0, 100);
-          element.classList.add('water-1');
-        }
-      }
-    }
-  }
-
-  // SPREAD -------------------------------------------------------------------
-
-  for (let index = 0; index < CURRENT_PRESET.water1Spread; index++) {
-    let islandWater1Elements2 = Array.from(document.getElementsByClassName('water-1'));
-
-    for (let islandWater1Element of islandWater1Elements2) {
-      let elementXCoord = islandWater1Element.id.split('-')[0];
-      let elementYCoord = islandWater1Element.id.split('-')[1];
-      //console.log(`${elementXCoord}-${elementYCoord}`);
-      let elementWaters = getCellSurroundingCells(Number(elementXCoord), Number(elementYCoord));
-      for (let elementWater of elementWaters) {
-        if (elementWater != null) {
-          let element = document.getElementById(elementWater);
-          if (!element.classList.contains('island-center') 
-            && !element.classList.contains('surrounding') 
-            && !element.classList.contains('beach') 
-            && !element.classList.contains('water-1')) {
-            let rnd = getRandomIntegerBetween(0, 100);
-            if (rnd < CURRENT_PRESET.water1SpreadProbability) {
-              element.classList.add('water-1');
-            }
-          }
-        }
-      }
-    }
-  }
-
-  // ISLAND WATER 2 ***************************************************************************************************
-
-  // Island Water 2 batch 1
-
-  let islandWater1Elements = Array.from(document.getElementsByClassName('water-1'));
-
-  for (let islandWater1Element of islandWater1Elements) {
-    let elementXCoord = islandWater1Element.id.split('-')[0];
-    let elementYCoord = islandWater1Element.id.split('-')[1];
-    //console.log(`${elementXCoord}-${elementYCoord}`);
-    let elementWaters = getCellCrossCells(Number(elementXCoord), Number(elementYCoord));
-    for (let elementWater of elementWaters) {
-      if (elementWater != null) {
-        let element = document.getElementById(elementWater);
-        if (!element.classList.contains('island-center') 
-          && !element.classList.contains('surrounding') 
-          && !element.classList.contains('beach') 
-          && !element.classList.contains('water-1')
-          && !element.classList.contains('water-2')) {
-          let rnd = getRandomIntegerBetween(0, 100);
-          element.classList.add('water-2');
-        }
-      }
-    }
-  }
-
-  // SPREAD -------------------------------------------------------------------
-
-  for (let index = 0; index < CURRENT_PRESET.water2Spread; index++) {
-    let islandWater2Elements = Array.from(document.getElementsByClassName('water-2'));
-
-    for (let islandWater2Element of islandWater2Elements) {
-      let elementXCoord = islandWater2Element.id.split('-')[0];
-      let elementYCoord = islandWater2Element.id.split('-')[1];
-      //console.log(`${elementXCoord}-${elementYCoord}`);
-      let elementWaters = getCellCrossCells(Number(elementXCoord), Number(elementYCoord));
-      for (let elementWater of elementWaters) {
-        if (elementWater != null) {
-          let element = document.getElementById(elementWater);
-          if (!element.classList.contains('island-center') 
-            && !element.classList.contains('surrounding') 
-            && !element.classList.contains('beach') 
-            && !element.classList.contains('water-1')
-            && !element.classList.contains('water-2')) {
-            let rnd = getRandomIntegerBetween(0, 100);
-            if (rnd < CURRENT_PRESET.water2SpreadProbability) {
-              element.classList.add('water-2');
-            }
-          }
-        }
-      }
-    }
-  }
-
-  setHiddenPoint();
-}
-
-function setHiddenPoint() {
-  let eligibleCells = [];
-  let coreCells = Array.from(document.getElementsByClassName('island-center'));
-  for (let coreCell of coreCells) { eligibleCells.push(coreCell.id); }
-  let landCells = Array.from(document.getElementsByClassName('surroundings'));
-  for (let landCell of landCells) { eligibleCells.push(landCell.id); }
-  let beachCells = Array.from(document.getElementsByClassName('beach'));
-  for (let beachCell of beachCells) { eligibleCells.push(beachCell.id); }
-
-  //console.log(eligibleCells.length);
-
-  let randomCell = eligibleCells[getRandomIntegerBetween(0, eligibleCells.length - 1)];
-
-  document.getElementById(randomCell).classList.add('hidden-point');
-}
-
-function onGenerateClick() {
-  FAILED_QUARTERS = 0;
-  setupGrid();
-  let quarters = document.getElementsByClassName('quarter-panel');
-  for (let quarter of quarters) {
-    quarter.classList.remove('failed');
-    quarter.classList.remove('win');
-  }
-  generateMap();
-  document.getElementById('mapMask').classList.remove('hidden');
-}
-window.onGenerateClick = onGenerateClick;
