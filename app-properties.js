@@ -1,5 +1,5 @@
 export const APP_NAME = "Island Generator";
-export const APP_VERSION = '0.0.0.6';
+export const APP_VERSION = '0.0.0.7';
 export const APP_LOCAL_STORAGE_ID = `island-generator-0001`;
 
 /* 
@@ -9,6 +9,6 @@ export const APP_LOCAL_STORAGE_ID = `island-generator-0001`;
 
 # CHANGELOG ###############################################
 
-v 0.0.0.6 - ajout génération par vague + reset presets
+v 0.0.0.7 - rework admin panel et config + zone quarter fail
 
 */
