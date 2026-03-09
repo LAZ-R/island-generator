@@ -129,9 +129,16 @@
           /* background-color: red !important; */
         }
 
-        img {
+        .sprite {
+          position: absolute;
+          inset: 0;
           width: 100%;
-          opacity: .33;
+
+          &.zoom-8 { opacity: .2; }
+          &.zoom-16 { opacity: .4; }
+          &.zoom-32 { opacity: .6; }
+          &.zoom-64 { opacity: .8; }
+          &.zoom-128 { opacity: 1; }
         }
       }
     }
@@ -321,7 +328,7 @@
       width: 66%;
       height: 66%;
       font-size: 24px;
-    border-radius: 16px;
+      border-radius: 16px;
       /* box-shadow: var(--box-shadow--default); */
     }
   }
@@ -330,18 +337,123 @@
 .bottom-area {
   display: flex;
   justify-content: space-between;
-  align-items: flex-end;
+  align-items: flex-start;
   width: 100%;
+  position: relative;
   /* background-color: magenta; */
+  gap: 16px;
 
-  .info-area {
+  .infos-area {
     display: flex;
-    justify-content: space-between;
+    justify-content: space-around;
     align-items: center;
     padding: 8px;
     border-radius: var(--border-radius--default);
-    border: 1px solid var(--color--fg-default);
-    opacity: .33;
+    /* border: 1px solid hsl(0, 0%, 72%);
+    color: hsl(0, 0%, 72%); */
+    min-width: 169px; width: 169px; max-width: 169px;
+    height: 35px;
+    transition: width .2s .2s linear, height .2s linear;
+    background-color: var(--color--bg-html);
+    gap: 8px;
+    overflow: hidden;
+    /* -webkit-box-shadow: inset 0px 4px 5px 1px rgba(0,0,0,0.3); 
+    box-shadow: inset 0px 4px 5px 1px rgba(0,0,0,0.3); */
+    background-color: var(--color--fg-default);
+
+    .quarter-failed-counter {
+      --stripe-color: hsla(0, 0%, 0%, 0.2);
+      width: 33%;
+      min-height: 28px; height: 28px; max-height: 28px;
+      border-radius: 500px;
+      
+      padding: 8px;
+
+    }
+    .quarter-failed-pill {
+      --size: 12px;
+      position: relative;
+      min-width: calc(3 * var(--size)); width: calc(3 * var(--size)); max-width: calc(3 * var(--size));
+      min-height: var(--size); height: var(--size); max-height: var(--size);
+      border: 2px solid grey;
+      border-radius: 500px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+
+      &.lit {
+        border: 2px solid rgb(252, 78, 78);
+        -webkit-box-shadow: 0px 0px 4px 3px hsla(0, 100%, 50%, .35); 
+        box-shadow: 0px 0px 4px 2px hsla(0, 100%, 50%, .25);
+
+        /* &::after {
+          content: '';
+          display: flex;
+          min-width: 65%; width: 65%; max-width: 65%;
+          min-height: 10%; height: 10%; max-height: 10%;
+          border-radius: 500px;
+        } */
+      }
+    }
+  }
+
+  .empty-box {
+    display: flex;
+    width: 100%;
+    height: 100%;
+    /* background-color: magenta; */
+    border-radius: var(--border-radius--default);
+    box-shadow: inset 0px 4px 5px 1px rgba(0,0,0,0.3);
+    -webkit-box-shadow: inset 0px 4px 5px 1px rgba(0,0,0,0.3); 
+  }
+
+  .admin-area {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: flex-start;
+    padding: 10px;
+    border-radius: var(--border-radius--default);
+    border: 1px solid hsl(0, 0%, 72%);
+    color: hsl(0, 0%, 72%);
+    width: 169px;
+    height: 42px;
+    opacity: 1;
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    transition: width .2s .2s linear, height .2s linear;
+    background-color: var(--color--bg-html);
+    gap: 12px;
+    overflow: hidden;
+
+    &.expanded {
+      width: 100%;
+      height: 333px;
+      transition: width .2s linear, height .2s .2s linear;
+    }
+
+    .config-panel {
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      align-items: flex-start;
+      width: 100%;
+      height: fit-content;
+      color: var(--color--fg-default);
+      overflow-y: scroll;
+
+      &::-webkit-scrollbar {
+        display: none;
+      }
+
+      .tile-header {
+        padding: 8px 0 !important;
+      }
+      .inner-body {
+        padding: 8px 0 !important;
+      }
+    }
   }
 
   .speaker {
@@ -352,7 +464,7 @@
     align-items: center;
     gap: var(--line-weight);
    /*  background-color: cyan; */
-    min-width: var(--size); width: var(--size); max-width: var(--size);
+    /* min-width: var(--size); width: var(--size); max-width: var(--size); */
     min-height: var(--size); height: var(--size); max-height: var(--size);
     border-radius: 500px;
     /* transform: rotate(45deg); */
@@ -377,86 +489,41 @@
   }
 }
 
-.inner-body {
-  background-color: white;
-}
-
-.top-info-area {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  width: 100%;
-}
-
-.lines-container {
+.config-block {
   display: flex;
   flex-direction: column;
+  justify-content: flex-start;
+  align-items: flex-start;
   width: 100%;
+  /* background-color: cyan; */
+  gap: 8px;
+
+
+  .block-title {
+    font-weight: 600;
+  }
 
   .line {
     display: flex;
     justify-content: space-between;
-    align-items: center;
+    align-items: flex-start;
     width: 100%;
-    padding: 8px 0;
-    border-bottom: 1px solid var(--color--fg-default);
 
-    &:first-child {
-      padding-top: 0;
-    }
-    &:last-child {
-      padding-bottom: 0;
-      border-bottom: 0;
-    }
-  
-    > span {
-      width: 64px;
-      font-weight: 600;
-    }
-  
-    .block {
+    .counter-block {
       display: flex;
-      justify-content: flex-end;
-      align-items: flex-start;
-      width: 136px;
-      gap: 8px;
-  
-      .block-line {
-        display: flex;
         justify-content: space-between;
         gap: 4px;
-        min-width: 80px; width: 80px; max-width: 80px;
+        width: 80px;
         font-weight: 600;
-
-        &.spread {
-          min-width: 72px; width: 72px; max-width: 72px;
-        }
-      }
     }
   }
 }
 
-.line-2 {
+
+
+.top-config-area {
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: flex-start;
   width: 100%;
-  gap: 8px;
-        font-weight: 600;
-
-  .block {
-    display: flex;
-    justify-content: flex-end;
-    align-items: flex-start;
-    width: 136px;
-      gap: 8px;
-
-    .block-line {
-      display: flex;
-        justify-content: space-between;
-        gap: 4px;
-        width: 86px;
-        font-weight: 600;
-    }
-  }
 }

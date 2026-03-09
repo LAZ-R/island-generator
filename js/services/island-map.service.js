@@ -135,7 +135,7 @@ function getCellNeighbourCells(xCoord, yCoord, type = 'full') {
 
 function generateMapObject() {
   // ISLANDS CENTAL POINTS ********************************************************************************************
-  for (let index = 0; index < CURRENT_PRESET.islandCount; index++) {
+  for (let index = 0; index < CURRENT_PRESET.seedsCount; index++) {
     // Centre de l'île 0
     let rndX = getRandomIntegerBetween(Math.round(MAP_X_SIZE * .15), Math.round(MAP_X_SIZE * .85));
     let rndY = getRandomIntegerBetween(Math.round(MAP_Y_SIZE * .15), Math.round(MAP_Y_SIZE * .85));
@@ -432,10 +432,10 @@ function renderMapFromBounds(bounds) {
           id="${cell.x_coord}-${cell.y_coord}" 
           class="grid-cell ${cell.terrain == null ? '' : cell.terrain} ${cell.isCentralPoint ? 'central-point' : ''} ${cell.isHiddenPoint ? 'hidden-point' : ''}"
           >
-          ${CURRENT_ZOOM >= 16 && CURRENT_ZOOM < 128 && cell.terrain == 'island-center' ? `<img src="${APP_ORIGIN}assets/medias/images/core.png" />` : ''}
-          ${CURRENT_ZOOM >= 16 && CURRENT_ZOOM < 128 && cell.terrain == 'surrounding' ? `<img src="${APP_ORIGIN}assets/medias/images/land.png" />` : ''}
-          ${CURRENT_ZOOM >= 16 && CURRENT_ZOOM < 128 && cell.terrain == 'beach' ? `<img src="${APP_ORIGIN}assets/medias/images/beach.png" />` : ''}
-          ${CURRENT_ZOOM == 128 ? `<img src="${APP_ORIGIN}assets/medias/images/win.png" style="opacity: 1;" />` : ''}
+          ${CURRENT_ZOOM >= 8 && cell.terrain == 'island-center' ? `<img class="sprite zoom-${CURRENT_ZOOM}" src="${APP_ORIGIN}assets/medias/images/${CURRENT_PRESET.id}-core.png" />` : ''}
+          ${CURRENT_ZOOM >= 8 && cell.terrain == 'surrounding' ? `<img class="sprite zoom-${CURRENT_ZOOM}" src="${APP_ORIGIN}assets/medias/images/${CURRENT_PRESET.id}-land.png" />` : ''}
+          ${CURRENT_ZOOM >= 8 && cell.terrain == 'beach' ? `<img class="sprite zoom-${CURRENT_ZOOM}" src="${APP_ORIGIN}assets/medias/images/${CURRENT_PRESET.id}-beach.png" />` : ''}
+          ${CURRENT_ZOOM == 128 ? `<img class="sprite final" src="${APP_ORIGIN}assets/medias/images/win.png" />` : ''}
         </div>`;
       htmlString += cellHtml;
     }

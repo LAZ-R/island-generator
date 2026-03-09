@@ -74,9 +74,16 @@ export function render() {
     </div>
 
     <div class="bottom-area">
-      <div class="info-area">
-        Scanotron 3000 &copy
+
+      <div class="infos-area">
+        <div id="quarterFailed1" class="quarter-failed-pill"></div>
+        <div id="quarterFailed2" class="quarter-failed-pill"></div>
+        <div id="quarterFailed3" class="quarter-failed-pill"></div>
       </div>
+
+      <div class="empty-box">
+      </div>
+      
       <div class="speaker">
         <div class="speaker-line small"></div>
         <div class="speaker-line medium"></div>
@@ -84,12 +91,37 @@ export function render() {
         <div class="speaker-line medium"></div>
         <div class="speaker-line small"></div>
       </div>
+
+
+
+
+
+      <div id="configBox" class="admin-area">
+        <span onclick="onConfigClick()">Scanotron 3000 &copy</span>
+        <div class="top-config-area">
+          ${getPresetSelectDom()}
+          <button class="lzr-button lzr-solid lzr-success" onclick="onGenerateClick()">Generate mission</button>
+        </div>
+        <div id="configPanel" class="config-panel">
+          ${getConfigDom()}
+        </div>
+      </div>
     </div>
   </div>
+  `;
 
-    
+  updateMenuDom('homepage');
+  updateValues();
 
-    <div class="lzr-drawer lzr-flat"">
+  setTimeout(() => {
+    onGenerateClick();
+  }, 300);
+
+}
+
+function getConfigDom() {
+  return `
+    <div class="lzr-drawer lzr-flat" style="margin-top: auto;">
       <div class="tile-header">
         <div>
           <span class="header-title">Config</span>
@@ -103,135 +135,179 @@ export function render() {
         <div class="expandable-inner">
           <div class="inner-body">
 
-            <div class="top-info-area lzr-margin-bottom">
-              ${getPresetSelectDom()}
-              <button class="lzr-button lzr-solid lzr-success" onclick="onGenerateClick()">Generate mission</button>
-            </div>
-            
-            <div class="line-2">
-              <div class="block">
-                <span>Count</span>
-                <div class="block-line">
-                  <button onclick="onMinusClick('island', 'count')">-</button>
-                  <span id="islandCount">${CURRENT_PRESET.islandCount}</span>
-                  <button onclick="onPlusClick('island', 'count')">+</button>
+            <!-- ============================ CORE ============================ -->
+            <div class="config-block">
+              <span class="block-title">Core</span>
+
+              <div class="line">
+                <span>Seeds count</span>
+                <div class="counter-block">
+                  <button onclick="onMinusClick('seed', 'count')">-</button>
+                  <span id="seedsCount">${CURRENT_PRESET.seedsCount}</span>
+                  <button onclick="onPlusClick('seed', 'count')">+</button>
+                </div>
+              </div>
+
+              <div class="line">
+                <span>Iterations</span>
+                <div class="counter-block">
+                  <button onclick="onMinusClick('core', 'iterations')">-</button>
+                  <span id="coreIterations">${CURRENT_PRESET.coreIterations}</span>
+                  <button onclick="onPlusClick('core', 'iterations')">+</button>
+                </div>
+              </div>
+
+              <div class="line">
+                <span>Proba min.</span>
+                <div class="counter-block">
+                  <button onclick="onMinusClick('core', 'probaMin')">-</button>
+                  <span id="coreProbaMin">${CURRENT_PRESET.coreProbaMin}%</span>
+                  <button onclick="onPlusClick('core', 'probaMin')">+</button>
+                </div>
+              </div>
+
+              <div class="line">
+                <span>Proba max.</span>
+                <div class="counter-block">
+                  <button onclick="onMinusClick('core', 'probaMax')">-</button>
+                  <span id="coreProbaMax">${CURRENT_PRESET.coreProbaMax}%</span>
+                  <button onclick="onPlusClick('core', 'probaMax')">+</button>
                 </div>
               </div>
             </div>
 
-            <div class="lines-container">
+            <hr>
+
+            <div class="config-block">
+              <span class="block-title">Main land</span>
 
               <div class="line">
-                <span>Core</span>
-                <div class="block">
-                  <span>Spread</span>
-                  <div class="block-line spread">
-                    <button onclick="onMinusClick('center', 'spread')">-</button>
-                    <span id="centerSpread">${CURRENT_PRESET.centerSpread}</span>
-                    <button onclick="onPlusClick('center', 'spread')">+</button>
-                  </div>
-                </div>
-                <div class="block">
-                  <span>Proba</span>
-                  <div class="block-line">
-                    <button onclick="onMinusClick('center', 'proba')">-</button>
-                    <span id="centerSpreadProbability">${CURRENT_PRESET.centerSpreadProbability}%</span>
-                    <button onclick="onPlusClick('center', 'proba')">+</button>
-                  </div>
+                <span>Spread count</span>
+                <div class="counter-block">
+                  <button onclick="onMinusClick('center', 'spread')">-</button>
+                  <span id="centerSpread">${CURRENT_PRESET.centerSpread}</span>
+                  <button onclick="onPlusClick('center', 'spread')">+</button>
                 </div>
               </div>
+
               <div class="line">
-                <span>Land</span>
-                <div class="block">
-                  <span>Spread</span>
-                  <div class="block-line spread">
-                    <button onclick="onMinusClick('surroundings', 'spread')">-</button>
-                    <span id="surroundingsSpread">${CURRENT_PRESET.surroundingsSpread}</span>
-                    <button onclick="onPlusClick('surroundings', 'spread')">+</button>
-                  </div>
-                </div>
-                <div class="block">
-                  <span>Proba</span>
-                  <div class="block-line">
-                    <button onclick="onMinusClick('surroundings', 'proba')">-</button>
-                    <span id="surroundingsSpreadProbability">${CURRENT_PRESET.surroundingsSpreadProbability}%</span>
-                    <button onclick="onPlusClick('surroundings', 'proba')">+</button>
-                  </div>
-                </div>
-              </div>
-              <div class="line">
-                <span>Beach</span>
-                <div class="block">
-                  <span>Spread</span>
-                  <div class="block-line spread">
-                    <button onclick="onMinusClick('beach', 'spread')">-</button>
-                    <span id="beachSpread">${CURRENT_PRESET.beachSpread}</span>
-                    <button onclick="onPlusClick('beach', 'spread')">+</button>
-                  </div>
-                </div>
-                <div class="block">
-                  <span>Proba</span>
-                  <div class="block-line">
-                    <button onclick="onMinusClick('beach', 'proba')">-</button>
-                    <span id="beachSpreadProbability">${CURRENT_PRESET.beachSpreadProbability}%</span>
-                    <button onclick="onPlusClick('beach', 'proba')">+</button>
-                  </div>
-                </div>
-              </div>
-              <div class="line">
-                <span>Water 1</span>
-                <div class="block">
-                  <span>Spread</span>
-                  <div class="block-line spread">
-                    <button onclick="onMinusClick('water1', 'spread')">-</button>
-                    <span id="water1Spread">${CURRENT_PRESET.water1Spread}</span>
-                    <button onclick="onPlusClick('water1', 'spread')">+</button>
-                  </div>
-                </div>
-                <div class="block">
-                  <span>Proba</span>
-                  <div class="block-line">
-                    <button onclick="onMinusClick('water1', 'proba')">-</button>
-                    <span id="water1SpreadProbability">${CURRENT_PRESET.water1SpreadProbability}%</span>
-                    <button onclick="onPlusClick('water1', 'proba')">+</button>
-                  </div>
-                </div>
-              </div>
-              <div class="line">
-                <span>Water 2</span>
-                <div class="block">
-                  <span>Spread</span>
-                  <div class="block-line spread">
-                    <button onclick="onMinusClick('water2', 'spread')">-</button>
-                    <span id="water2Spread">${CURRENT_PRESET.water2Spread}</span>
-                    <button onclick="onPlusClick('water2', 'spread')">+</button>
-                  </div>
-                </div>
-                <div class="block">
-                  <span>Proba</span>
-                  <div class="block-line">
-                    <button onclick="onMinusClick('water2', 'proba')">-</button>
-                    <span id="water2SpreadProbability">${CURRENT_PRESET.water2SpreadProbability}%</span>
-                    <button onclick="onPlusClick('water2', 'proba')">+</button>
-                  </div>
+                <span>Spread probability</span>
+                <div class="counter-block">
+                  <button onclick="onMinusClick('center', 'proba')">-</button>
+                  <span id="centerSpreadProbability">${CURRENT_PRESET.centerSpreadProbability}</span>
+                  <button onclick="onPlusClick('center', 'proba')">+</button>
                 </div>
               </div>
             </div>
+
+            <hr>
+
+            <div class="config-block">
+              <span class="block-title">Coast</span>
+
+              <div class="line">
+                <span>Spread count</span>
+                <div class="counter-block">
+                  <button onclick="onMinusClick('surroundings', 'spread')">-</button>
+                  <span id="surroundingsSpread">${CURRENT_PRESET.surroundingsSpread}</span>
+                  <button onclick="onPlusClick('surroundings', 'spread')">+</button>
+                </div>
+              </div>
+
+              <div class="line">
+                <span>Spread probability</span>
+                <div class="counter-block">
+                  <button onclick="onMinusClick('surroundings', 'proba')">-</button>
+                  <span id="surroundingsSpreadProbability">${CURRENT_PRESET.surroundingsSpreadProbability}</span>
+                  <button onclick="onPlusClick('surroundings', 'proba')">+</button>
+                </div>
+              </div>
+            </div>
+
+            <hr>
+
+            <div class="config-block">
+              <span class="block-title">Beach</span>
+
+              <div class="line">
+                <span>Spread count</span>
+                <div class="counter-block">
+                  <button onclick="onMinusClick('beach', 'spread')">-</button>
+                  <span id="beachSpread">${CURRENT_PRESET.beachSpread}</span>
+                  <button onclick="onPlusClick('beach', 'spread')">+</button>
+                </div>
+              </div>
+
+              <div class="line">
+                <span>Spread probability</span>
+                <div class="counter-block">
+                  <button onclick="onMinusClick('beach', 'proba')">-</button>
+                  <span id="beachSpreadProbability">${CURRENT_PRESET.beachSpreadProbability}</span>
+                  <button onclick="onPlusClick('beach', 'proba')">+</button>
+                </div>
+              </div>
+            </div>
+
+            <hr>
+
+            <div class="config-block">
+              <span class="block-title">Water 1</span>
+
+              <div class="line">
+                <span>Spread count</span>
+                <div class="counter-block">
+                  <button onclick="onMinusClick('water1', 'spread')">-</button>
+                  <span id="water1Spread">${CURRENT_PRESET.water1Spread}</span>
+                  <button onclick="onPlusClick('water1', 'spread')">+</button>
+                </div>
+              </div>
+
+              <div class="line">
+                <span>Spread probability</span>
+                <div class="counter-block">
+                  <button onclick="onMinusClick('water1', 'proba')">-</button>
+                  <span id="water1SpreadProbability">${CURRENT_PRESET.water1SpreadProbability}</span>
+                  <button onclick="onPlusClick('water1', 'proba')">+</button>
+                </div>
+              </div>
+            </div>
+
+            <hr>
+
+            <div class="config-block">
+              <span class="block-title">Water 2</span>
+
+              <div class="line">
+                <span>Spread count</span>
+                <div class="counter-block">
+                  <button onclick="onMinusClick('water2', 'spread')">-</button>
+                  <span id="water2Spread">${CURRENT_PRESET.water2Spread}</span>
+                  <button onclick="onPlusClick('water2', 'spread')">+</button>
+                </div>
+              </div>
+
+              <div class="line">
+                <span>Spread probability</span>
+                <div class="counter-block">
+                  <button onclick="onMinusClick('water2', 'proba')">-</button>
+                  <span id="water2SpreadProbability">${CURRENT_PRESET.water2SpreadProbability}</span>
+                  <button onclick="onPlusClick('water2', 'proba')">+</button>
+                </div>
+              </div>
+            </div>
+
           </div>
         </div>
       </div>
     </div>
   `;
-
-  updateMenuDom('homepage');
-  updateValues();
-
-  setTimeout(() => {
-    onGenerateClick();
-  }, 300);
-
 }
 
+function onConfigClick() {
+  const configBox = document.getElementById('configBox');
+  configBox.classList.toggle('expanded', !configBox.classList.contains('expanded'));
+}
+window.onConfigClick = onConfigClick;
 
 function onQuarterSelect(vertical, horizontal) {
   //console.log(vertical, horizontal);
@@ -318,7 +394,11 @@ function scanQuarter(vertical, horizontal) {
         if (CURRENT_ZOOM < 64) {
           zoomToQuarter(vertical, horizontal);
           FAILED_QUARTERS = 0;
-          console.log(`current zoom: ${CURRENT_ZOOM}`);
+          let failedQuartersPills = document.getElementsByClassName('quarter-failed-pill');
+          for (let failedQuartersPill of failedQuartersPills) {
+            failedQuartersPill.classList.remove('lit');
+          }
+          //console.log(`current zoom: ${CURRENT_ZOOM}`);
           const zoomLevelsDom = document.getElementsByClassName('zoom-label');
           for (let zoomLevelDom of zoomLevelsDom) {
             zoomLevelDom.classList.toggle('selected', zoomLevelDom.id == `zoom${CURRENT_ZOOM}`);
@@ -327,13 +407,20 @@ function scanQuarter(vertical, horizontal) {
           // FINAL WIN
           zoomToQuarter(vertical, horizontal);
           FAILED_QUARTERS = 0;
-          console.log(`current zoom: ${CURRENT_ZOOM}`);
+          let failedQuartersPills = document.getElementsByClassName('quarter-failed-pill');
+          for (let failedQuartersPill of failedQuartersPills) {
+            failedQuartersPill.classList.remove('lit');
+          }
+          //console.log(`current zoom: ${CURRENT_ZOOM}`);
           const zoomLevelsDom = document.getElementsByClassName('zoom-label');
           for (let zoomLevelDom of zoomLevelsDom) {
             zoomLevelDom.classList.toggle('selected', zoomLevelDom.id == `zoom${CURRENT_ZOOM}`);
           }
           setTimeout(() => {
-            onGenerateClick();
+            document.getElementById('mapMask').classList.add('hidden');
+            setTimeout(() => {
+              onGenerateClick();
+            }, 1000);
           }, 2000);
         }
       }, 600);
@@ -346,6 +433,10 @@ function scanQuarter(vertical, horizontal) {
 
       quarterElement.classList.add('failed');
       FAILED_QUARTERS += 1;
+      let failedQuartersPills = document.getElementsByClassName('quarter-failed-pill');
+      for (let failedQuartersPill of failedQuartersPills) {
+        if (failedQuartersPill.id == `quarterFailed${FAILED_QUARTERS}`) failedQuartersPill.classList.add('lit');
+      }
 
       if (FAILED_QUARTERS == 3) {
         setTimeout(() => {
@@ -377,6 +468,10 @@ function onGenerateClick() {
     quarter.classList.remove('failed');
     quarter.classList.remove('win');
   }
+  let failedQuartersPills = document.getElementsByClassName('quarter-failed-pill');
+  for (let failedQuartersPill of failedQuartersPills) {
+    failedQuartersPill.classList.remove('lit');
+  }
 
   // GENERATE NEW
   initNewMap();
@@ -388,11 +483,16 @@ function onGenerateClick() {
 }
 window.onGenerateClick = onGenerateClick;
 
-// FONCTIONS SPECIFIQUE CONFIGURATION, à ne pas toucher pour le moment
+
+
+
+
+
+// FONCTIONS SPECIFIQUE CONFIGURATION
 
 function getPresetSelectDom() {
   let str = `
-    <select id="select" class="lzr-select lzr-solid" onchange="onSelectChange(event)">
+    <select id="select" class="lzr-select lzr-outlined" onchange="onSelectChange(event)">
       <button id=custombutton>
         <selectedcontent></selectedcontent>
       </button>
@@ -405,7 +505,7 @@ function getPresetSelectDom() {
 }
 
 function onSelectChange(event) {
-  console.log(event.target.value);
+  //console.log(event.target.value);
   let preset = PRESETS.find((e) => e.id == event.target.value);
   setPreset(preset);
   updateValues();
@@ -429,7 +529,10 @@ function updateValues() {
   document.getElementById('water1SpreadProbability').innerHTML = `${CURRENT_PRESET.water1SpreadProbability}%`; 
   document.getElementById('water2SpreadProbability').innerHTML = `${CURRENT_PRESET.water2SpreadProbability}%`; 
 
-  document.getElementById('islandCount').innerHTML = CURRENT_PRESET.islandCount;
+  document.getElementById('seedsCount').innerHTML = CURRENT_PRESET.seedsCount;
+  document.getElementById('coreIterations').innerHTML = CURRENT_PRESET.coreIterations;
+  document.getElementById('coreProbaMin').innerHTML = `${CURRENT_PRESET.coreProbaMin}%`;
+  document.getElementById('coreProbaMax').innerHTML = `${CURRENT_PRESET.coreProbaMax}%`;
 }
 
 function onMinusClick(categ, type) {
@@ -455,7 +558,16 @@ function onMinusClick(categ, type) {
       }
       break;
     case 'count':
-      if (CURRENT_PRESET.islandCount > 1) CURRENT_PRESET.islandCount -= 1; 
+      if (CURRENT_PRESET.seedsCount > 1) CURRENT_PRESET.seedsCount -= 1; 
+      break;
+    case 'iterations':
+      if (CURRENT_PRESET.coreIterations > 1) CURRENT_PRESET.coreIterations -= 1; 
+      break;
+    case 'probaMin':
+      if (CURRENT_PRESET.coreProbaMin > 1) CURRENT_PRESET.coreProbaMin -= 1; 
+      break;
+    case 'probaMax':
+      if (CURRENT_PRESET.coreProbaMax > 1) CURRENT_PRESET.coreProbaMax -= 1; 
       break;
     default:
       break;
@@ -489,7 +601,16 @@ function onPlusClick(categ, type) {
       }
       break;
     case 'count':
-      CURRENT_PRESET.islandCount += 1;
+      CURRENT_PRESET.seedsCount += 1;
+      break;
+    case 'iterations':
+      if (CURRENT_PRESET.coreIterations > 1) CURRENT_PRESET.coreIterations += 1; 
+      break;
+    case 'probaMin':
+      if (CURRENT_PRESET.coreProbaMin > 1) CURRENT_PRESET.coreProbaMin += 1; 
+      break;
+    case 'probaMax':
+      if (CURRENT_PRESET.coreProbaMax > 1) CURRENT_PRESET.coreProbaMax += 1; 
       break;
     default:
       break;

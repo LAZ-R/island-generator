@@ -4,7 +4,7 @@ export const PRESETS = [
     id: 'default',
     name: 'Default',
     // island seeds
-    islandCount: 6,
+    seedsCount: 6,
     // seeds
     coreIterations: 64, // plus = plus de chance d'avoir des formes cheloues
     coreProbaMin: 15, 
@@ -26,7 +26,7 @@ export const PRESETS = [
     id: 'realistic',
     name: 'Realistic',
     // island seeds
-    islandCount: 4,
+    seedsCount: 4,
     // seeds
     coreIterations: 12, // plus = plus de chance d'avoir des formes cheloues
     coreProbaMin: 20, 
@@ -36,7 +36,7 @@ export const PRESETS = [
     centerSpreadProbability: 20,
     surroundingsSpread: 16,
     surroundingsSpreadProbability: 20,
-    beachSpread: 6,
+    beachSpread: 4,
     beachSpreadProbability: 8,
     water1Spread: 24,
     water1SpreadProbability: 8,
@@ -47,7 +47,7 @@ export const PRESETS = [
   /* {
     id: 'tropical',
     name: 'Tropical islands',
-    islandCount: 14,
+    seedsCount: 14,
     centerSpread: 14 * 2,
     centerSpreadProbability: 17,
     surroundingsSpread: 3 * 2,
@@ -62,9 +62,9 @@ export const PRESETS = [
   // volcanic islands
   {
     id: 'volcanic',
-    name: 'Volcanic islands',
+    name: 'Volcanic',
     // island seeds
-    islandCount: 3,
+    seedsCount: 3,
     // seeds
     coreIterations: 6, // plus = plus de chance d'avoir des formes cheloues
     coreProbaMin: 20, 
@@ -85,7 +85,7 @@ export const PRESETS = [
   /* {
     id: 'fjord',
     name: 'Fjords',
-    islandCount: 6,
+    seedsCount: 6,
     centerSpread: 26 * 2,
     centerSpreadProbability: 14,
     surroundingsSpread: 7 * 2,
@@ -100,7 +100,7 @@ export const PRESETS = [
   /* {
     id: 'continent',
     name: 'Continent',
-    islandCount: 3,
+    seedsCount: 3,
     centerSpread: 36 * 2,
     centerSpreadProbability: 22,
     surroundingsSpread: 6 * 2,
@@ -116,7 +116,7 @@ export const PRESETS = [
     id: 'coral-hell',
     name: 'Coral hell',
     // island seeds
-    islandCount: 16,
+    seedsCount: 16,
     // seeds
     coreIterations: 72, // plus = plus de chance d'avoir des formes cheloues
     coreProbaMin: 8, 
@@ -136,7 +136,7 @@ export const PRESETS = [
   /* {
     id: 'mangrove',
     name: 'Mangrove delta',
-    islandCount: 24,
+    seedsCount: 24,
     centerSpread: 2 * 2,
     centerSpreadProbability: 2,
     surroundingsSpread: 12 * 2,
