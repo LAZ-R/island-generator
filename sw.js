@@ -1,4 +1,4 @@
-const version = '0.0.0.5';
+const version = '0.0.0.6';
 const CACHE_NAME = `island-generator-${version}`;
 
 const APP_SHELL = [

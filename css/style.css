@@ -39,13 +39,6 @@
 
 /* Views */
 @import url("../js/views/homepage/homepage.view.css");
-@import url("../js/views/pokedex/pokedex.view.css");
-@import url("../js/views/pokemon/pokemon.view.css");
-@import url("../js/views/guide/guide.view.css");
-@import url("../js/views/map/map.view.css");
-@import url("../js/views/types-table/types-table.view.css");
-@import url("../js/views/who-is-that-pokemon/who-is-that-pokemon.view.css");
-@import url("../js/views/glitches/glitches.view.css");
 @import url("../js/views/settings/settings.view.css");
 @import url("../js/views/not-found/not-found.view.css");
 

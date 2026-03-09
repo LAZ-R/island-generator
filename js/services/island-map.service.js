@@ -3,7 +3,7 @@ import { APP_ORIGIN } from "../router.js";
 import { getRandomIntegerBetween } from "../utils/math.utils.js";
 
 
-export let CURRENT_PRESET = {...PRESETS[1]};
+export let CURRENT_PRESET = {...PRESETS[0]};
 
 // FULL MAP
 const MAP_X_SIZE = 128;
@@ -50,6 +50,7 @@ function setupGrid() {
       FULL_MAP[`${x_coord}-${y_coord}`] = {
         x_coord,
         y_coord,
+        isActive: false,
         terrain: null,
         isCentralPoint: false,
         isHiddenPoint: false
@@ -143,67 +144,38 @@ function generateMapObject() {
   
     rndCell.terrain = 'island-center';
     rndCell.isCentralPoint = true;
+    rndCell.isActive = true;
   }
 
   // ISLAND CENTRAL BASE **********************************************************************************************
   const CENTER_BASE_MODES_POOL = [
-    'full', 'full',
+    'full',
     'plus', 'plus',
-    'cross'
+    'cross', 'cross',
   ];
-  
 
-  // Island center batch 1
+  const CENTER_SPREAD_MODES_POOL = [
+    'full',
+    'plus', 'plus', 'plus',
+    'cross', 'cross'
+  ];
 
-  let islandsCentralPoints = Object.values(FULL_MAP).filter((cell) => cell.terrain == 'island-center');
-  for (let cell of islandsCentralPoints) {
+  for (let index = 0; index < CURRENT_PRESET.coreIterations; index++) {
+    let islandsCentralCores = Object.values(FULL_MAP).filter((cell) => cell.terrain === 'island-center' && cell.isActive);
+
+    for (let cell of islandsCentralCores) {
     let cellNeighbours = getCellNeighbourCells(cell.x_coord, cell.y_coord, CENTER_BASE_MODES_POOL[getRandomIntegerBetween(0, CENTER_BASE_MODES_POOL.length - 1)]);
-    for (let cellNeighbour of cellNeighbours) {
-      if (cellNeighbour != null) {
-        if (cellNeighbour.terrain != 'island-center') {
+      for (let cellNeighbour of cellNeighbours) {
+        if (cellNeighbour != null) {
           let rnd = getRandomIntegerBetween(0, 100);
-          const centerBaseBatch1Probability = getRandomIntegerBetween(35, 60);
-          if (rnd < centerBaseBatch1Probability) {
+          const individualProbabilityCeiling = getRandomIntegerBetween(CURRENT_PRESET.coreProbaMin, CURRENT_PRESET.coreProbaMax);
+          if (rnd < individualProbabilityCeiling) {
             cellNeighbour.terrain = 'island-center';
+            cellNeighbour.isActive = true;
           }
         }
       }
-    }
-  }
-
-  // Island center batch 2
-
-  let islandsCentralInit = Object.values(FULL_MAP).filter((cell) => cell.terrain == 'island-center');
-  for (let cell of islandsCentralInit) {
-    let cellNeighbours = getCellNeighbourCells(cell.x_coord, cell.y_coord, CENTER_BASE_MODES_POOL[getRandomIntegerBetween(0, CENTER_BASE_MODES_POOL.length - 1)]);
-    for (let cellNeighbour of cellNeighbours) {
-      if (cellNeighbour != null) {
-        if (cellNeighbour.terrain != 'island-center') {
-          let rnd = getRandomIntegerBetween(0, 100);
-          const centerBaseBatch2Probability = getRandomIntegerBetween(25, 55);
-          if (rnd < centerBaseBatch2Probability) {
-            cellNeighbour.terrain = 'island-center';
-          }
-        }
-      }
-    }
-  }
-
-  // Island center batch 3
-
-  let islandsCentralInit2 = Object.values(FULL_MAP).filter((cell) => cell.terrain == 'island-center');
-  for (let cell of islandsCentralInit2) {
-    let cellNeighbours = getCellNeighbourCells(cell.x_coord, cell.y_coord, CENTER_BASE_MODES_POOL[getRandomIntegerBetween(0, CENTER_BASE_MODES_POOL.length - 1)]);
-    for (let cellNeighbour of cellNeighbours) {
-      if (cellNeighbour != null) {
-        if (cellNeighbour.terrain != 'island-center') {
-          let rnd = getRandomIntegerBetween(0, 100);
-          const centerBaseBatch3Probability = getRandomIntegerBetween(20, 50);
-          if (rnd < centerBaseBatch3Probability) {
-            cellNeighbour.terrain = 'island-center';
-          }
-        }
-      }
+      cell.isActive = false;
     }
   }
 
@@ -213,7 +185,7 @@ function generateMapObject() {
     let islandsCentralCores = Object.values(FULL_MAP).filter((cell) => cell.terrain == 'island-center');
 
     for (let cell of islandsCentralCores) {
-    let cellNeighbours = getCellNeighbourCells(cell.x_coord, cell.y_coord, 'cross');
+      let cellNeighbours = getCellNeighbourCells(cell.x_coord, cell.y_coord, CENTER_SPREAD_MODES_POOL[getRandomIntegerBetween(0, CENTER_SPREAD_MODES_POOL.length - 1)]);
       for (let cellNeighbour of cellNeighbours) {
         if (cellNeighbour != null) {
           if (cellNeighbour.terrain != 'island-center') {
@@ -239,6 +211,7 @@ function generateMapObject() {
         if (cellNeighbour.terrain != 'island-center' 
           && cellNeighbour.terrain != 'surrounding') {
           cellNeighbour.terrain = 'surrounding';
+          cellNeighbour.isActive = true;
         }
       }
     }
@@ -247,10 +220,10 @@ function generateMapObject() {
   // SPREAD -------------------------------------------------------------------
 
   for (let index = 0; index < CURRENT_PRESET.surroundingsSpread; index++) {
-    let islandsSurroundingsBatch1 = Object.values(FULL_MAP).filter((cell) => cell.terrain == 'surrounding');
+    let islandsSurroundingsBatch1 = Object.values(FULL_MAP).filter((cell) => cell.terrain == 'surrounding' && cell.isActive);
 
     for (let cell of islandsSurroundingsBatch1) {
-    let cellNeighbours = getCellNeighbourCells(cell.x_coord, cell.y_coord, 'plus');
+      let cellNeighbours = getCellNeighbourCells(cell.x_coord, cell.y_coord, CENTER_SPREAD_MODES_POOL[getRandomIntegerBetween(0, CENTER_SPREAD_MODES_POOL.length - 1)]);
       for (let cellNeighbour of cellNeighbours) {
         if (cellNeighbour != null) {
           if (cellNeighbour.terrain != 'island-center'
@@ -258,10 +231,12 @@ function generateMapObject() {
             let rnd = getRandomIntegerBetween(0, 100);
             if (rnd < CURRENT_PRESET.surroundingsSpreadProbability) {
               cellNeighbour.terrain = 'surrounding';
+              cellNeighbour.isActive = true;
             }
           }
         }
       }
+      cell.isActive = false;
     }
   }
 
@@ -278,6 +253,7 @@ function generateMapObject() {
           && cellNeighbour.terrain != 'surrounding'
           && cellNeighbour.terrain != 'beach') {
           cellNeighbour.terrain = 'beach';
+          cellNeighbour.isActive = true;
         }
       }
     }
@@ -285,25 +261,57 @@ function generateMapObject() {
 
   // SPREAD -------------------------------------------------------------------
 
-  for (let index = 0; index < CURRENT_PRESET.beachSpread; index++) {
-    let islandsBeachesBatch1 = Object.values(FULL_MAP).filter((cell) => cell.terrain == 'beach');
+  if (CURRENT_PRESET.id != 'coral-hell') {
 
-    for (let cell of islandsBeachesBatch1) {
-    let cellNeighbours = getCellNeighbourCells(cell.x_coord, cell.y_coord, 'cross');
-      for (let cellNeighbour of cellNeighbours) {
-        if (cellNeighbour != null) {
-          if (cellNeighbour.terrain != 'island-center'
-            && cellNeighbour.terrain != 'surrounding'
-            && cellNeighbour.terrain != 'beach') {
-            let rnd = getRandomIntegerBetween(0, 100);
-            if (rnd < CURRENT_PRESET.beachSpreadProbability) {
-              cellNeighbour.terrain = 'beach';
+    for (let index = 0; index < CURRENT_PRESET.beachSpread; index++) {
+      let islandsBeachesBatch1 = Object.values(FULL_MAP).filter((cell) => cell.terrain == 'beach');
+  
+      for (let cell of islandsBeachesBatch1) {
+        let cellNeighbours = getCellNeighbourCells(cell.x_coord, cell.y_coord, CENTER_SPREAD_MODES_POOL[getRandomIntegerBetween(0, CENTER_SPREAD_MODES_POOL.length - 1)]);
+        for (let cellNeighbour of cellNeighbours) {
+          if (cellNeighbour != null) {
+            if (cellNeighbour.terrain != 'island-center'
+              && cellNeighbour.terrain != 'surrounding'
+              && cellNeighbour.terrain != 'beach') {
+              let rnd = getRandomIntegerBetween(0, 100);
+              if (rnd < CURRENT_PRESET.beachSpreadProbability) {
+                cellNeighbour.terrain = 'beach';
+              }
             }
           }
         }
       }
     }
+  } else {
+    const CORAL_HELL_SPREAD_MODES_POOL = [
+      'full',
+      'plus', 'plus',
+      'cross', 'cross', 'cross',
+    ];
+    for (let index = 0; index < CURRENT_PRESET.beachSpread; index++) {
+      let islandsBeachesBatch1 = Object.values(FULL_MAP).filter((cell) => cell.terrain == 'beach' && cell.isActive);
+  
+      for (let cell of islandsBeachesBatch1) {
+        let cellNeighbours = getCellNeighbourCells(cell.x_coord, cell.y_coord, CORAL_HELL_SPREAD_MODES_POOL[getRandomIntegerBetween(0, CENTER_SPREAD_MODES_POOL.length - 1)]);
+        for (let cellNeighbour of cellNeighbours) {
+          if (cellNeighbour != null) {
+            if (cellNeighbour.terrain != 'island-center'
+              && cellNeighbour.terrain != 'surrounding'
+              && cellNeighbour.terrain != 'beach') {
+              let rnd = getRandomIntegerBetween(0, 100);
+              let rnd2 = getRandomIntegerBetween(0, 100);
+              if (rnd < (CURRENT_PRESET.beachSpreadProbability * (rnd2 / 100))) {
+                cellNeighbour.terrain = 'beach';
+                cellNeighbour.isActive = true;
+              }
+            }
+          }
+        }
+        cell.isActive = false;
+      }
+    }
   }
+
 
   // ISLAND WATER 1 ***************************************************************************************************
 
@@ -311,7 +319,7 @@ function generateMapObject() {
 
   let islandsBeachesSpread = Object.values(FULL_MAP).filter((cell) => cell.terrain == 'beach');
   for (let cell of islandsBeachesSpread) {
-    let cellNeighbours = getCellNeighbourCells(cell.x_coord, cell.y_coord, 'full');
+    let cellNeighbours = getCellNeighbourCells(cell.x_coord, cell.y_coord, 'plus');
     for (let cellNeighbour of cellNeighbours) {
       if (cellNeighbour != null) {
         if (cellNeighbour.terrain != 'island-center' 
@@ -330,7 +338,7 @@ function generateMapObject() {
     let islandsWater1Batch1 = Object.values(FULL_MAP).filter((cell) => cell.terrain == 'water-1');
 
     for (let cell of islandsWater1Batch1) {
-    let cellNeighbours = getCellNeighbourCells(cell.x_coord, cell.y_coord, 'cross');
+    let cellNeighbours = getCellNeighbourCells(cell.x_coord, cell.y_coord, CENTER_BASE_MODES_POOL[getRandomIntegerBetween(0, CENTER_BASE_MODES_POOL.length - 1)]);
       for (let cellNeighbour of cellNeighbours) {
         if (cellNeighbour != null) {
           if (cellNeighbour.terrain != 'island-center'
