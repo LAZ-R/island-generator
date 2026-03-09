@@ -102,7 +102,7 @@ export function render() {
           ${getPresetSelectDom()}
           <button class="lzr-button lzr-solid lzr-success" onclick="onGenerateClick()">Generate mission</button>
         </div>
-        <div id="configPanel" class="config-panel">
+        <div id="configPanel" class="config-panel" style="margin-top: auto;">
           ${getConfigDom()}
         </div>
       </div>
@@ -121,7 +121,7 @@ export function render() {
 
 function getConfigDom() {
   return `
-    <div class="lzr-drawer lzr-flat" style="margin-top: auto;">
+    <div class="lzr-drawer lzr-flat">
       <div class="tile-header">
         <div>
           <span class="header-title">Config</span>

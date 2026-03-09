@@ -9,6 +9,6 @@ export const APP_LOCAL_STORAGE_ID = `island-generator-0001`;
 
 # CHANGELOG ###############################################
 
-v 0.0.0.7 - rework admin panel et config + zone quarter fail
+v 0.0.0.8 - ajout sprites par défaut 
 
 */
