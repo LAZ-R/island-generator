@@ -3,7 +3,7 @@
 ![CSS3](https://img.shields.io/badge/css3-%231572B6.svg?style=for-the-badge&logo=css3&logoColor=white)
 ![JavaScript](https://img.shields.io/badge/javascript-%23323330.svg?style=for-the-badge&logo=javascript&logoColor=%23F7DF1E)  
 
-Version `0.0.0.8`
+Version `0.0.0.9`
 
 **[Tester la version déployée sur GitHub Pages](https://laz-r.github.io/island-generator/)**
 
@@ -17,6 +17,7 @@ This is mostly a *proof of concept* so the code here is awfull, I know.
 
 ## Changelog
 
+- v 0.0.0.9 - rework generation : neighbour profile configurable par terrain + wave mode configurable par terrain + nouveaux presets
 - v 0.0.0.8 - ajout sprites par défaut 
 - v 0.0.0.7 - rework admin panel et config + zone quarter fail
 - v 0.0.0.6 - ajout génération par vague + reset presets

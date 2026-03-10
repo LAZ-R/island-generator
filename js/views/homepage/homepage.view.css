@@ -44,7 +44,8 @@
         --background-color: if(
           style(--map-theme: 'realistic'): hsl(227, 33%, 25%);
           style(--map-theme: 'volcanic'):  hsl(190, 40%, 45%);
-          style(--map-theme: 'fjord'):     hsl(190, 80%, 40%);
+          style(--map-theme: 'coral-hell'):  hsl(203, 28%, 35%);
+          style(--map-theme: 'iceberg'):     hsl(190, 80%, 40%);
           style(--map-theme: 'mangrove'):  hsl(45, 12%, 45%);
           else: hsl(200, 80%, 50%)
         );
@@ -61,31 +62,23 @@
         transition: opacity .5s linear;
         overflow: hidden;
     
-        &.island-center {
+        &.mainland {
           --background-color: if(
             style(--map-theme: 'realistic'):  hsl(131, 10%, 33%);
             style(--map-theme: 'volcanic'):  hsl(30, 5%, 30%);
-            style(--map-theme: 'fjord'):   hsl(178, 10%, 98%);
-              style(--map-theme: 'mangrove'):  hsl(122, 33%, 30%);
+            style(--map-theme: 'coral-hell'):  hsl(160, 20%, 40%);
+            style(--map-theme: 'iceberg'):   hsl(178, 10%, 98%);
+            style(--map-theme: 'mangrove'):  hsl(122, 33%, 30%);
             else: hsl(111, 21%, 36%)
           );
-    
-          &.spreaded {
-            --background-color: if(
-              style(--map-theme: 'realistic'):  hsl(139, 12%, 35%);
-              style(--map-theme: 'volcanic'):  hsl(30, 5%, 30%);
-              style(--map-theme: 'fjord'):   hsl(178, 10%, 98%);
-              style(--map-theme: 'mangrove'):  hsl(122, 33%, 30%);
-              else: hsl(111, 21%, 36%)
-            );
-          }
         }
     
-        &.surrounding {
+        &.coast {
           --background-color: if(
             style(--map-theme: 'realistic'):  hsl(34, 25%, 55%);
             style(--map-theme: 'volcanic'):  hsl(30, 5%, 40%);
-            style(--map-theme: 'fjord'):   hsl(178, 60%, 95%);
+            style(--map-theme: 'coral-hell'):  hsl(170, 30%, 50%);
+            style(--map-theme: 'iceberg'):   hsl(178, 60%, 95%);
             style(--map-theme: 'mangrove'):  hsl(119, 28%, 35%);
             else: hsl(80, 17%, 56%)
           );
@@ -95,27 +88,30 @@
           --background-color: if(
             style(--map-theme: 'realistic'):  hsl(10, 51%, 91%);
             style(--map-theme: 'volcanic'):  hsl(30, 5%, 50%);
-            style(--map-theme: 'fjord'):   hsl(185, 80%, 80%);
+            style(--map-theme: 'coral-hell'):  hsl(180, 40%, 60%);
+            style(--map-theme: 'iceberg'):   hsl(185, 80%, 80%);
             style(--map-theme: 'mangrove'):  hsl(40, 25%, 60%);
             else: hsl(39, 50%, 90%)
           );
         }
     
-        &.water-1 {
+        &.water1 {
           --background-color: if(
             style(--map-theme: 'realistic'):  hsl(165, 25%, 69%);
             style(--map-theme: 'volcanic'):  hsl(190, 30%, 55%);
-            style(--map-theme: 'fjord'):   hsl(185, 80%, 60%);
+            style(--map-theme: 'coral-hell'):  hsl(190, 52%, 40%);
+            style(--map-theme: 'iceberg'):   hsl(185, 80%, 60%);
             style(--map-theme: 'mangrove'):  hsl(39, 20%, 55%);
             else: hsl(175, 70%, 70%)
           );
         }
     
-        &.water-2 {
+        &.water2 {
           --background-color: if(
             style(--map-theme: 'realistic'):  hsl(197, 48%, 36%);
             style(--map-theme: 'volcanic'):  hsl(190, 35%, 50%);
-            style(--map-theme: 'fjord'):   hsl(190, 80%, 50%);
+            style(--map-theme: 'coral-hell'):  hsl(197, 48%, 36%);
+            style(--map-theme: 'iceberg'):   hsl(190, 80%, 50%);
             style(--map-theme: 'mangrove'):  hsl(42, 15%, 50%);
             else: hsl(190, 80%, 50%)
           );
@@ -506,15 +502,94 @@
   .line {
     display: flex;
     justify-content: space-between;
-    align-items: flex-start;
+    align-items: center;
     width: 100%;
 
     .counter-block {
       display: flex;
-        justify-content: space-between;
-        gap: 4px;
-        width: 80px;
-        font-weight: 600;
+      justify-content: space-between;
+      gap: 4px;
+      width: 80px;
+      font-weight: 600;
+    }
+
+    .switch-container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      font-weight: 600;
+      font-size: 14px;
+
+      .lzr-switch { /* The switch - the box around the slider */
+        -webkit-tap-highlight-color: transparent;
+        position: relative;
+        display: inline-block;
+        width: 48px;
+        height: 24px;
+      
+        /* Hide default HTML checkbox */
+        input {
+          opacity: 0;
+          width: 0;
+          height: 0;
+      
+          /* Checked */
+          &:checked + .slider {
+            background-color: var(--color--fg-default);
+      
+            &:before {
+              background-color: var(--color--bg-default);
+              -webkit-transition: .3s;
+              transition: .3s ease-out;
+              -webkit-transform: translateX(24px);
+              -ms-transform: translateX(24px);
+              transform: translateX(24px);
+            }
+          }
+        }
+      
+        /* The slider */
+        .slider {
+          position: absolute;
+          cursor: pointer;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          background-color: var(--color--bg-default);
+          -webkit-transition: .3s;
+          transition: .3s ease-out;
+          border-radius: var(--border-radius--default);
+        
+          &:before {
+            position: absolute;
+            content: "";
+            height: 12px;
+            width: 12px;
+            left: 6px;
+            bottom: 6px;
+            background-color:  var(--color--fg-default);
+            -webkit-transition: .3s;
+            transition: .3s ease-out;
+            border-radius: 4px;
+          }
+        
+          /* Rounded sliders */
+          &.round {
+            border-radius: 500px;
+        
+            &:before {
+              border-radius: 500px;
+            }
+          }
+        }
+      }
+    }
+
+    .lzr-select {
+      font-size: 14px;
+      padding: 0;
     }
   }
 }

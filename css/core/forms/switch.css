@@ -51,7 +51,7 @@
         background-color:  var(--color--fg-default);
         -webkit-transition: .3s;
         transition: .3s ease-out;
-      border-radius: var(--border-radius--default);
+        border-radius: 4px;
       }
     
       /* Rounded sliders */

@@ -1,4 +1,4 @@
-import { PRESETS } from "../data/island-presets.data.js";
+import { NEIGHBOUR_PROFILES, PRESETS } from "../data/island-presets.data.js";
 import { APP_ORIGIN } from "../router.js";
 import { getRandomIntegerBetween } from "../utils/math.utils.js";
 
@@ -133,6 +133,27 @@ function getCellNeighbourCells(xCoord, yCoord, type = 'full') {
   return neighbours;
 }
 
+function pickNeighbourType(weights) {
+  if (!weights) return 'plus';
+
+  const entries = Object.entries(weights).filter(([, weight]) => weight > 0);
+  if (entries.length === 0) return 'plus';
+
+  const totalWeight = entries.reduce((sum, [, weight]) => sum + weight, 0);
+  const roll = getRandomIntegerBetween(1, totalWeight);
+
+  let cumulative = 0;
+
+  for (const [type, weight] of entries) {
+    cumulative += weight;
+    if (roll <= cumulative) {
+      return type;
+    }
+  }
+
+  return 'plus';
+}
+
 function generateMapObject() {
   // ISLANDS CENTAL POINTS ********************************************************************************************
   for (let index = 0; index < CURRENT_PRESET.seedsCount; index++) {
@@ -142,35 +163,24 @@ function generateMapObject() {
   
     let rndCell = FULL_MAP[getCellKey(rndX, rndY)];
   
-    rndCell.terrain = 'island-center';
+    rndCell.terrain = 'mainland';
     rndCell.isCentralPoint = true;
     rndCell.isActive = true;
   }
 
   // ISLAND CENTRAL BASE **********************************************************************************************
-  const CENTER_BASE_MODES_POOL = [
-    'full',
-    'plus', 'plus',
-    'cross', 'cross',
-  ];
-
-  const CENTER_SPREAD_MODES_POOL = [
-    'full',
-    'plus', 'plus', 'plus',
-    'cross', 'cross'
-  ];
-
+  
   for (let index = 0; index < CURRENT_PRESET.coreIterations; index++) {
-    let islandsCentralCores = Object.values(FULL_MAP).filter((cell) => cell.terrain === 'island-center' && cell.isActive);
+    let islandsCentralCores = Object.values(FULL_MAP).filter((cell) => cell.terrain === 'mainland' && cell.isActive);
 
     for (let cell of islandsCentralCores) {
-    let cellNeighbours = getCellNeighbourCells(cell.x_coord, cell.y_coord, CENTER_BASE_MODES_POOL[getRandomIntegerBetween(0, CENTER_BASE_MODES_POOL.length - 1)]);
+    let cellNeighbours = getCellNeighbourCells(cell.x_coord, cell.y_coord, pickNeighbourType(NEIGHBOUR_PROFILES["Default"]));
       for (let cellNeighbour of cellNeighbours) {
         if (cellNeighbour != null) {
           let rnd = getRandomIntegerBetween(0, 100);
           const individualProbabilityCeiling = getRandomIntegerBetween(CURRENT_PRESET.coreProbaMin, CURRENT_PRESET.coreProbaMax);
           if (rnd < individualProbabilityCeiling) {
-            cellNeighbour.terrain = 'island-center';
+            cellNeighbour.terrain = 'mainland';
             cellNeighbour.isActive = true;
           }
         }
@@ -180,21 +190,43 @@ function generateMapObject() {
   }
 
   // SPREAD -------------------------------------------------------------------
+  if (!CURRENT_PRESET.mainlandWaveSpread) {
+    for (let index = 0; index < CURRENT_PRESET.mainlandSpread; index++) {
+      let islandsCentralCores = Object.values(FULL_MAP).filter((cell) => cell.terrain == 'mainland');
 
-  for (let index = 0; index < CURRENT_PRESET.centerSpread; index++) {
-    let islandsCentralCores = Object.values(FULL_MAP).filter((cell) => cell.terrain == 'island-center');
-
-    for (let cell of islandsCentralCores) {
-      let cellNeighbours = getCellNeighbourCells(cell.x_coord, cell.y_coord, CENTER_SPREAD_MODES_POOL[getRandomIntegerBetween(0, CENTER_SPREAD_MODES_POOL.length - 1)]);
-      for (let cellNeighbour of cellNeighbours) {
-        if (cellNeighbour != null) {
-          if (cellNeighbour.terrain != 'island-center') {
-            let rnd = getRandomIntegerBetween(0, 100);
-            if (rnd < CURRENT_PRESET.centerSpreadProbability) {
-              cellNeighbour.terrain = 'island-center';
+      for (let cell of islandsCentralCores) {
+        let cellNeighbours = getCellNeighbourCells(cell.x_coord, cell.y_coord, pickNeighbourType(NEIGHBOUR_PROFILES[CURRENT_PRESET.mainlandNeighbourProfile]));
+        for (let cellNeighbour of cellNeighbours) {
+          if (cellNeighbour != null) {
+            if (cellNeighbour.terrain != 'mainland') {
+              let rnd = getRandomIntegerBetween(0, 100);
+              if (rnd < CURRENT_PRESET.mainlandSpreadProbability) {
+                cellNeighbour.terrain = 'mainland';
+              }
             }
           }
         }
+      }
+    }
+  } else {
+    for (let index = 0; index < CURRENT_PRESET.mainlandSpread; index++) {
+      let islandsCentralCores = Object.values(FULL_MAP).filter((cell) => cell.terrain == 'mainland' && cell.isActive);
+
+      for (let cell of islandsCentralCores) {
+        let cellNeighbours = getCellNeighbourCells(cell.x_coord, cell.y_coord, pickNeighbourType(NEIGHBOUR_PROFILES[CURRENT_PRESET.mainlandNeighbourProfile]));
+        for (let cellNeighbour of cellNeighbours) {
+          if (cellNeighbour != null) {
+            if (cellNeighbour.terrain != 'mainland') {
+              let rnd = getRandomIntegerBetween(0, 100);
+              let rnd2 = getRandomIntegerBetween(0, 100);
+              if (rnd < (CURRENT_PRESET.mainlandSpreadProbability * (rnd2 / 100))) {
+                cellNeighbour.terrain = 'mainland';
+                cellNeighbour.isActive = true;
+              }
+            }
+          }
+        }
+        cell.isActive = false;
       }
     }
   }
@@ -203,14 +235,14 @@ function generateMapObject() {
 
   // Island Surroundings batch 1
 
-  let islandsCentralSpread = Object.values(FULL_MAP).filter((cell) => cell.terrain == 'island-center');
+  let islandsCentralSpread = Object.values(FULL_MAP).filter((cell) => cell.terrain == 'mainland');
   for (let cell of islandsCentralSpread) {
     let cellNeighbours = getCellNeighbourCells(cell.x_coord, cell.y_coord, 'plus');
     for (let cellNeighbour of cellNeighbours) {
       if (cellNeighbour != null) {
-        if (cellNeighbour.terrain != 'island-center' 
-          && cellNeighbour.terrain != 'surrounding') {
-          cellNeighbour.terrain = 'surrounding';
+        if (cellNeighbour.terrain != 'mainland' 
+          && cellNeighbour.terrain != 'coast') {
+          cellNeighbour.terrain = 'coast';
           cellNeighbour.isActive = true;
         }
       }
@@ -218,25 +250,46 @@ function generateMapObject() {
   }
 
   // SPREAD -------------------------------------------------------------------
+  if (!CURRENT_PRESET.coastWaveSpread) {
+    for (let index = 0; index < CURRENT_PRESET.coastSpread; index++) {
+      let islandsSurroundingsBatch1 = Object.values(FULL_MAP).filter((cell) => cell.terrain == 'coast');
 
-  for (let index = 0; index < CURRENT_PRESET.surroundingsSpread; index++) {
-    let islandsSurroundingsBatch1 = Object.values(FULL_MAP).filter((cell) => cell.terrain == 'surrounding' && cell.isActive);
-
-    for (let cell of islandsSurroundingsBatch1) {
-      let cellNeighbours = getCellNeighbourCells(cell.x_coord, cell.y_coord, CENTER_SPREAD_MODES_POOL[getRandomIntegerBetween(0, CENTER_SPREAD_MODES_POOL.length - 1)]);
-      for (let cellNeighbour of cellNeighbours) {
-        if (cellNeighbour != null) {
-          if (cellNeighbour.terrain != 'island-center'
-            && cellNeighbour.terrain != 'surrounding') {
-            let rnd = getRandomIntegerBetween(0, 100);
-            if (rnd < CURRENT_PRESET.surroundingsSpreadProbability) {
-              cellNeighbour.terrain = 'surrounding';
-              cellNeighbour.isActive = true;
+      for (let cell of islandsSurroundingsBatch1) {
+        let cellNeighbours = getCellNeighbourCells(cell.x_coord, cell.y_coord, pickNeighbourType(NEIGHBOUR_PROFILES[CURRENT_PRESET.coastNeighbourProfile]));
+        for (let cellNeighbour of cellNeighbours) {
+          if (cellNeighbour != null) {
+            if (cellNeighbour.terrain != 'mainland'
+              && cellNeighbour.terrain != 'coast') {
+              let rnd = getRandomIntegerBetween(0, 100);
+              if (rnd < CURRENT_PRESET.coastSpreadProbability) {
+                cellNeighbour.terrain = 'coast';
+              }
             }
           }
         }
       }
-      cell.isActive = false;
+    }
+  } else {
+    for (let index = 0; index < CURRENT_PRESET.coastSpread; index++) {
+      let islandsSurroundingsBatch1 = Object.values(FULL_MAP).filter((cell) => cell.terrain == 'coast' && cell.isActive);
+
+      for (let cell of islandsSurroundingsBatch1) {
+        let cellNeighbours = getCellNeighbourCells(cell.x_coord, cell.y_coord, pickNeighbourType(NEIGHBOUR_PROFILES[CURRENT_PRESET.coastNeighbourProfile]));
+        for (let cellNeighbour of cellNeighbours) {
+          if (cellNeighbour != null) {
+            if (cellNeighbour.terrain != 'mainland'
+              && cellNeighbour.terrain != 'coast') {
+              let rnd = getRandomIntegerBetween(0, 100);
+              let rnd2 = getRandomIntegerBetween(0, 100);
+              if (rnd < (CURRENT_PRESET.coastSpreadProbability * (rnd2 / 100))) {
+                cellNeighbour.terrain = 'coast';
+                cellNeighbour.isActive = true;
+              }
+            }
+          }
+        }
+        cell.isActive = false;
+      }
     }
   }
 
@@ -244,13 +297,13 @@ function generateMapObject() {
 
   // Island Beach batch 1
 
-  let islandsSurroundingsSpread = Object.values(FULL_MAP).filter((cell) => cell.terrain == 'surrounding');
+  let islandsSurroundingsSpread = Object.values(FULL_MAP).filter((cell) => cell.terrain == 'coast');
   for (let cell of islandsSurroundingsSpread) {
     let cellNeighbours = getCellNeighbourCells(cell.x_coord, cell.y_coord, 'plus');
     for (let cellNeighbour of cellNeighbours) {
       if (cellNeighbour != null) {
-        if (cellNeighbour.terrain != 'island-center' 
-          && cellNeighbour.terrain != 'surrounding'
+        if (cellNeighbour.terrain != 'mainland' 
+          && cellNeighbour.terrain != 'coast'
           && cellNeighbour.terrain != 'beach') {
           cellNeighbour.terrain = 'beach';
           cellNeighbour.isActive = true;
@@ -261,17 +314,16 @@ function generateMapObject() {
 
   // SPREAD -------------------------------------------------------------------
 
-  if (CURRENT_PRESET.id != 'coral-hell') {
-
+  if (!CURRENT_PRESET.beachWaveSpread) {
     for (let index = 0; index < CURRENT_PRESET.beachSpread; index++) {
       let islandsBeachesBatch1 = Object.values(FULL_MAP).filter((cell) => cell.terrain == 'beach');
   
       for (let cell of islandsBeachesBatch1) {
-        let cellNeighbours = getCellNeighbourCells(cell.x_coord, cell.y_coord, CENTER_SPREAD_MODES_POOL[getRandomIntegerBetween(0, CENTER_SPREAD_MODES_POOL.length - 1)]);
+        let cellNeighbours = getCellNeighbourCells(cell.x_coord, cell.y_coord, pickNeighbourType(NEIGHBOUR_PROFILES[CURRENT_PRESET.beachNeighbourProfile]));
         for (let cellNeighbour of cellNeighbours) {
           if (cellNeighbour != null) {
-            if (cellNeighbour.terrain != 'island-center'
-              && cellNeighbour.terrain != 'surrounding'
+            if (cellNeighbour.terrain != 'mainland'
+              && cellNeighbour.terrain != 'coast'
               && cellNeighbour.terrain != 'beach') {
               let rnd = getRandomIntegerBetween(0, 100);
               if (rnd < CURRENT_PRESET.beachSpreadProbability) {
@@ -283,20 +335,15 @@ function generateMapObject() {
       }
     }
   } else {
-    const CORAL_HELL_SPREAD_MODES_POOL = [
-      'full',
-      'plus', 'plus',
-      'cross', 'cross', 'cross',
-    ];
     for (let index = 0; index < CURRENT_PRESET.beachSpread; index++) {
       let islandsBeachesBatch1 = Object.values(FULL_MAP).filter((cell) => cell.terrain == 'beach' && cell.isActive);
   
       for (let cell of islandsBeachesBatch1) {
-        let cellNeighbours = getCellNeighbourCells(cell.x_coord, cell.y_coord, CORAL_HELL_SPREAD_MODES_POOL[getRandomIntegerBetween(0, CENTER_SPREAD_MODES_POOL.length - 1)]);
+        let cellNeighbours = getCellNeighbourCells(cell.x_coord, cell.y_coord, pickNeighbourType(NEIGHBOUR_PROFILES[CURRENT_PRESET.beachNeighbourProfile]));
         for (let cellNeighbour of cellNeighbours) {
           if (cellNeighbour != null) {
-            if (cellNeighbour.terrain != 'island-center'
-              && cellNeighbour.terrain != 'surrounding'
+            if (cellNeighbour.terrain != 'mainland'
+              && cellNeighbour.terrain != 'coast'
               && cellNeighbour.terrain != 'beach') {
               let rnd = getRandomIntegerBetween(0, 100);
               let rnd2 = getRandomIntegerBetween(0, 100);
@@ -322,35 +369,61 @@ function generateMapObject() {
     let cellNeighbours = getCellNeighbourCells(cell.x_coord, cell.y_coord, 'plus');
     for (let cellNeighbour of cellNeighbours) {
       if (cellNeighbour != null) {
-        if (cellNeighbour.terrain != 'island-center' 
-          && cellNeighbour.terrain != 'surrounding'
+        if (cellNeighbour.terrain != 'mainland' 
+          && cellNeighbour.terrain != 'coast'
           && cellNeighbour.terrain != 'beach'
-          && cellNeighbour.terrain != 'water-1') {
-          cellNeighbour.terrain = 'water-1';
+          && cellNeighbour.terrain != 'water1') {
+          cellNeighbour.terrain = 'water1';
+          cellNeighbour.isActive = true;
         }
       }
     }
   }
 
   // SPREAD -------------------------------------------------------------------
+  if (!CURRENT_PRESET.water1WaveSpread) {
+    for (let index = 0; index < CURRENT_PRESET.water1Spread; index++) {
+      let islandsWater1Batch1 = Object.values(FULL_MAP).filter((cell) => cell.terrain == 'water1');
 
-  for (let index = 0; index < CURRENT_PRESET.water1Spread; index++) {
-    let islandsWater1Batch1 = Object.values(FULL_MAP).filter((cell) => cell.terrain == 'water-1');
-
-    for (let cell of islandsWater1Batch1) {
-    let cellNeighbours = getCellNeighbourCells(cell.x_coord, cell.y_coord, CENTER_BASE_MODES_POOL[getRandomIntegerBetween(0, CENTER_BASE_MODES_POOL.length - 1)]);
-      for (let cellNeighbour of cellNeighbours) {
-        if (cellNeighbour != null) {
-          if (cellNeighbour.terrain != 'island-center'
-            && cellNeighbour.terrain != 'surrounding'
-            && cellNeighbour.terrain != 'beach'
-            && cellNeighbour.terrain != 'water-1') {
-            let rnd = getRandomIntegerBetween(0, 100);
-            if (rnd < CURRENT_PRESET.water1SpreadProbability) {
-              cellNeighbour.terrain = 'water-1';
+      for (let cell of islandsWater1Batch1) {
+        let cellNeighbours = getCellNeighbourCells(cell.x_coord, cell.y_coord, pickNeighbourType(NEIGHBOUR_PROFILES[CURRENT_PRESET.water1NeighbourProfile]));
+        for (let cellNeighbour of cellNeighbours) {
+          if (cellNeighbour != null) {
+            if (cellNeighbour.terrain != 'mainland'
+              && cellNeighbour.terrain != 'coast'
+              && cellNeighbour.terrain != 'beach'
+              && cellNeighbour.terrain != 'water1') {
+              let rnd = getRandomIntegerBetween(0, 100);
+              if (rnd < CURRENT_PRESET.water1SpreadProbability) {
+                cellNeighbour.terrain = 'water1';
+              }
             }
           }
         }
+      }
+    }
+  } else {
+    for (let index = 0; index < CURRENT_PRESET.water1Spread; index++) {
+      let islandsWater1Batch1 = Object.values(FULL_MAP).filter((cell) => cell.terrain == 'water1' && cell.isActive);
+
+      for (let cell of islandsWater1Batch1) {
+        let cellNeighbours = getCellNeighbourCells(cell.x_coord, cell.y_coord, pickNeighbourType(NEIGHBOUR_PROFILES[CURRENT_PRESET.water1NeighbourProfile]));
+        for (let cellNeighbour of cellNeighbours) {
+          if (cellNeighbour != null) {
+            if (cellNeighbour.terrain != 'mainland'
+              && cellNeighbour.terrain != 'coast'
+              && cellNeighbour.terrain != 'beach'
+              && cellNeighbour.terrain != 'water1') {
+              let rnd = getRandomIntegerBetween(0, 100);
+              let rnd2 = getRandomIntegerBetween(0, 100);
+              if (rnd < (CURRENT_PRESET.water1SpreadProbability * (rnd2 / 100))) {
+                cellNeighbour.terrain = 'water1';
+                cellNeighbour.isActive = true;
+              }
+            }
+          }
+        }
+        cell.isActive = false;
       }
     }
   }
@@ -359,49 +432,76 @@ function generateMapObject() {
 
   // Island Water 2 batch 1
 
-  let islandsWater1Spread = Object.values(FULL_MAP).filter((cell) => cell.terrain == 'water-1');
+  let islandsWater1Spread = Object.values(FULL_MAP).filter((cell) => cell.terrain == 'water1');
   for (let cell of islandsWater1Spread) {
     let cellNeighbours = getCellNeighbourCells(cell.x_coord, cell.y_coord, 'plus');
     for (let cellNeighbour of cellNeighbours) {
       if (cellNeighbour != null) {
-        if (cellNeighbour.terrain != 'island-center' 
-          && cellNeighbour.terrain != 'surrounding'
+        if (cellNeighbour.terrain != 'mainland' 
+          && cellNeighbour.terrain != 'coast'
           && cellNeighbour.terrain != 'beach'
-          && cellNeighbour.terrain != 'water-1'
-          && cellNeighbour.terrain != 'water-2') {
-          cellNeighbour.terrain = 'water-2';
+          && cellNeighbour.terrain != 'water1'
+          && cellNeighbour.terrain != 'water2') {
+          cellNeighbour.terrain = 'water2';
+          cellNeighbour.isActive = true;
         }
       }
     }
   }
 
   // SPREAD -------------------------------------------------------------------
+  if (!CURRENT_PRESET.water2WaveSpread) {
+    for (let index = 0; index < CURRENT_PRESET.water2Spread; index++) {
+      let islandsWater2Batch1 = Object.values(FULL_MAP).filter((cell) => cell.terrain == 'water2');
 
-  for (let index = 0; index < CURRENT_PRESET.water2Spread; index++) {
-    let islandsWater2Batch1 = Object.values(FULL_MAP).filter((cell) => cell.terrain == 'water-2');
-
-    for (let cell of islandsWater2Batch1) {
-    let cellNeighbours = getCellNeighbourCells(cell.x_coord, cell.y_coord, 'plus');
-      for (let cellNeighbour of cellNeighbours) {
-        if (cellNeighbour != null) {
-          if (cellNeighbour.terrain != 'island-center'
-            && cellNeighbour.terrain != 'surrounding'
-            && cellNeighbour.terrain != 'beach'
-            && cellNeighbour.terrain != 'water-1'
-            && cellNeighbour.terrain != 'water-2') {
-            let rnd = getRandomIntegerBetween(0, 100);
-            if (rnd < CURRENT_PRESET.water2SpreadProbability) {
-              cellNeighbour.terrain = 'water-2';
+      for (let cell of islandsWater2Batch1) {
+        let cellNeighbours = getCellNeighbourCells(cell.x_coord, cell.y_coord, pickNeighbourType(NEIGHBOUR_PROFILES[CURRENT_PRESET.water2NeighbourProfile]));
+        for (let cellNeighbour of cellNeighbours) {
+          if (cellNeighbour != null) {
+            if (cellNeighbour.terrain != 'mainland'
+              && cellNeighbour.terrain != 'coast'
+              && cellNeighbour.terrain != 'beach'
+              && cellNeighbour.terrain != 'water1'
+              && cellNeighbour.terrain != 'water2') {
+              let rnd = getRandomIntegerBetween(0, 100);
+              if (rnd < CURRENT_PRESET.water2SpreadProbability) {
+                cellNeighbour.terrain = 'water2';
+              }
             }
           }
         }
+      }
+    }
+  } else {
+    for (let index = 0; index < CURRENT_PRESET.water2Spread; index++) {
+      let islandsWater2Batch1 = Object.values(FULL_MAP).filter((cell) => cell.terrain == 'water2' && cell.isActive);
+
+      for (let cell of islandsWater2Batch1) {
+        let cellNeighbours = getCellNeighbourCells(cell.x_coord, cell.y_coord, pickNeighbourType(NEIGHBOUR_PROFILES[CURRENT_PRESET.water2NeighbourProfile]));
+        for (let cellNeighbour of cellNeighbours) {
+          if (cellNeighbour != null) {
+            if (cellNeighbour.terrain != 'mainland'
+              && cellNeighbour.terrain != 'coast'
+              && cellNeighbour.terrain != 'beach'
+              && cellNeighbour.terrain != 'water1'
+              && cellNeighbour.terrain != 'water2') {
+              let rnd = getRandomIntegerBetween(0, 100);
+              let rnd2 = getRandomIntegerBetween(0, 100);
+              if (rnd < (CURRENT_PRESET.water2SpreadProbability * (rnd2 / 100))) {
+                cellNeighbour.terrain = 'water2';
+                cellNeighbour.isActive = true;
+              }
+            }
+          }
+        }
+        cell.isActive = false;
       }
     }
   }
 }
 
 function setHiddenPoint() {
-  let eligibleCells = Object.values(FULL_MAP).filter((cell) => cell.terrain == 'island-center' || cell.terrain == 'surrounding' || cell.terrain == 'beach');
+  let eligibleCells = Object.values(FULL_MAP).filter((cell) => cell.terrain == 'mainland' || cell.terrain == 'coast' || cell.terrain == 'beach');
   let randomCell = eligibleCells[getRandomIntegerBetween(0, eligibleCells.length - 1)];
 
   randomCell.isHiddenPoint = true;
@@ -432,8 +532,8 @@ function renderMapFromBounds(bounds) {
           id="${cell.x_coord}-${cell.y_coord}" 
           class="grid-cell ${cell.terrain == null ? '' : cell.terrain} ${cell.isCentralPoint ? 'central-point' : ''} ${cell.isHiddenPoint ? 'hidden-point' : ''}"
           >
-          ${CURRENT_ZOOM >= 8 && cell.terrain == 'island-center' ? `<img class="sprite zoom-${CURRENT_ZOOM}" src="${APP_ORIGIN}assets/medias/images/${CURRENT_PRESET.id}-core.png" />` : ''}
-          ${CURRENT_ZOOM >= 8 && cell.terrain == 'surrounding' ? `<img class="sprite zoom-${CURRENT_ZOOM}" src="${APP_ORIGIN}assets/medias/images/${CURRENT_PRESET.id}-land.png" />` : ''}
+          ${CURRENT_ZOOM >= 8 && cell.terrain == 'mainland' ? `<img class="sprite zoom-${CURRENT_ZOOM}" src="${APP_ORIGIN}assets/medias/images/${CURRENT_PRESET.id}-mainland.png" />` : ''}
+          ${CURRENT_ZOOM >= 8 && cell.terrain == 'coast' ? `<img class="sprite zoom-${CURRENT_ZOOM}" src="${APP_ORIGIN}assets/medias/images/${CURRENT_PRESET.id}-coast.png" />` : ''}
           ${CURRENT_ZOOM >= 8 && cell.terrain == 'beach' ? `<img class="sprite zoom-${CURRENT_ZOOM}" src="${APP_ORIGIN}assets/medias/images/${CURRENT_PRESET.id}-beach.png" />` : ''}
           ${CURRENT_ZOOM == 128 ? `<img class="sprite final" src="${APP_ORIGIN}assets/medias/images/win.png" />` : ''}
         </div>`;

@@ -9,7 +9,7 @@ import { showToast } from "../../services/toast.service.js";
 import { isLaptopOrUp, isPhone, isTablet } from "../../utils/breakpoints.js";
 import { getRandomIntegerBetween } from "../../utils/math.utils.js";
 import { CURRENT_PRESET, CURRENT_ZOOM, getQuarterBounds, initNewMap, isHiddenPointInBounds, setPreset, zoomToQuarter } from "../../services/island-map.service.js";
-import { PRESETS } from "../../data/island-presets.data.js";
+import { NEIGHBOUR_PROFILES, PRESETS } from "../../data/island-presets.data.js";
 
 // VARIABLES //////////////////////////////////////////////////////////////////////////////////////
 const HEADER_ICON_CONTAINER = document.getElementById('headerIconContainer');
@@ -91,10 +91,6 @@ export function render() {
         <div class="speaker-line medium"></div>
         <div class="speaker-line small"></div>
       </div>
-
-
-
-
 
       <div id="configBox" class="admin-area">
         <span onclick="onConfigClick()">Scanotron 3000 &copy</span>
@@ -182,20 +178,37 @@ function getConfigDom() {
               <span class="block-title">Main land</span>
 
               <div class="line">
+                <span>Spread mode</span>
+                <div class="switch-container">
+                  <span>Default</span>
+                  <label class="lzr-switch">
+                    <input id="mainlandWaveSpread" type="checkbox" onclick="onSwitchClick(event, 'mainland')" ${CURRENT_PRESET.mainlandWaveSpread ? 'checked' : ''} />
+                    <span class="slider"></span>
+                  </label>
+                  <span>Wave</span>
+                </div>
+              </div>
+
+              <div class="line">
+                <span>Neighbour profile</span>
+                ${getNeighbourProfileSelectDom('mainland')}
+              </div>
+
+              <div class="line">
                 <span>Spread count</span>
                 <div class="counter-block">
-                  <button onclick="onMinusClick('center', 'spread')">-</button>
-                  <span id="centerSpread">${CURRENT_PRESET.centerSpread}</span>
-                  <button onclick="onPlusClick('center', 'spread')">+</button>
+                  <button onclick="onMinusClick('mainland', 'spread')">-</button>
+                  <span id="mainlandSpread">${CURRENT_PRESET.mainlandSpread}</span>
+                  <button onclick="onPlusClick('mainland', 'spread')">+</button>
                 </div>
               </div>
 
               <div class="line">
                 <span>Spread probability</span>
                 <div class="counter-block">
-                  <button onclick="onMinusClick('center', 'proba')">-</button>
-                  <span id="centerSpreadProbability">${CURRENT_PRESET.centerSpreadProbability}</span>
-                  <button onclick="onPlusClick('center', 'proba')">+</button>
+                  <button onclick="onMinusClick('mainland', 'proba')">-</button>
+                  <span id="mainlandSpreadProbability">${CURRENT_PRESET.mainlandSpreadProbability}</span>
+                  <button onclick="onPlusClick('mainland', 'proba')">+</button>
                 </div>
               </div>
             </div>
@@ -206,20 +219,37 @@ function getConfigDom() {
               <span class="block-title">Coast</span>
 
               <div class="line">
+                <span>Spread mode</span>
+                <div class="switch-container">
+                  <span>Default</span>
+                  <label class="lzr-switch">
+                    <input id="coastWaveSpread" type="checkbox" onclick="onSwitchClick(event, 'coast')" ${CURRENT_PRESET.coastWaveSpread ? 'checked' : ''} />
+                    <span class="slider"></span>
+                  </label>
+                  <span>Wave</span>
+                </div>
+              </div>
+
+              <div class="line">
+                <span>Neighbour profile</span>
+                ${getNeighbourProfileSelectDom('coast')}
+              </div>
+
+              <div class="line">
                 <span>Spread count</span>
                 <div class="counter-block">
-                  <button onclick="onMinusClick('surroundings', 'spread')">-</button>
-                  <span id="surroundingsSpread">${CURRENT_PRESET.surroundingsSpread}</span>
-                  <button onclick="onPlusClick('surroundings', 'spread')">+</button>
+                  <button onclick="onMinusClick('coast', 'spread')">-</button>
+                  <span id="coastSpread">${CURRENT_PRESET.coastSpread}</span>
+                  <button onclick="onPlusClick('coast', 'spread')">+</button>
                 </div>
               </div>
 
               <div class="line">
                 <span>Spread probability</span>
                 <div class="counter-block">
-                  <button onclick="onMinusClick('surroundings', 'proba')">-</button>
-                  <span id="surroundingsSpreadProbability">${CURRENT_PRESET.surroundingsSpreadProbability}</span>
-                  <button onclick="onPlusClick('surroundings', 'proba')">+</button>
+                  <button onclick="onMinusClick('coast', 'proba')">-</button>
+                  <span id="coastSpreadProbability">${CURRENT_PRESET.coastSpreadProbability}</span>
+                  <button onclick="onPlusClick('coast', 'proba')">+</button>
                 </div>
               </div>
             </div>
@@ -228,6 +258,23 @@ function getConfigDom() {
 
             <div class="config-block">
               <span class="block-title">Beach</span>
+
+              <div class="line">
+                <span>Spread mode</span>
+                <div class="switch-container">
+                  <span>Default</span>
+                  <label class="lzr-switch">
+                    <input id="beachWaveSpread" type="checkbox" onclick="onSwitchClick(event, 'beach')" ${CURRENT_PRESET.beachWaveSpread ? 'checked' : ''} />
+                    <span class="slider"></span>
+                  </label>
+                  <span>Wave</span>
+                </div>
+              </div>
+
+              <div class="line">
+                <span>Neighbour profile</span>
+                ${getNeighbourProfileSelectDom('beach')}
+              </div>
 
               <div class="line">
                 <span>Spread count</span>
@@ -254,6 +301,23 @@ function getConfigDom() {
               <span class="block-title">Water 1</span>
 
               <div class="line">
+                <span>Spread mode</span>
+                <div class="switch-container">
+                  <span>Default</span>
+                  <label class="lzr-switch">
+                    <input id="water1WaveSpread" type="checkbox" onclick="onSwitchClick(event, 'water1')" ${CURRENT_PRESET.water1WaveSpread ? 'checked' : ''} />
+                    <span class="slider"></span>
+                  </label>
+                  <span>Wave</span>
+                </div>
+              </div>
+
+              <div class="line">
+                <span>Neighbour profile</span>
+                ${getNeighbourProfileSelectDom('water1')}
+              </div>
+
+              <div class="line">
                 <span>Spread count</span>
                 <div class="counter-block">
                   <button onclick="onMinusClick('water1', 'spread')">-</button>
@@ -276,6 +340,23 @@ function getConfigDom() {
 
             <div class="config-block">
               <span class="block-title">Water 2</span>
+
+              <div class="line">
+                <span>Spread mode</span>
+                <div class="switch-container">
+                  <span>Default</span>
+                  <label class="lzr-switch">
+                    <input id="water2WaveSpread" type="checkbox" onclick="onSwitchClick(event, 'water2')" ${CURRENT_PRESET.water2WaveSpread ? 'checked' : ''} />
+                    <span class="slider"></span>
+                  </label>
+                  <span>Wave</span>
+                </div>
+              </div>
+
+              <div class="line">
+                <span>Neighbour profile</span>
+                ${getNeighbourProfileSelectDom('water2')}
+              </div>
 
               <div class="line">
                 <span>Spread count</span>
@@ -303,11 +384,8 @@ function getConfigDom() {
   `;
 }
 
-function onConfigClick() {
-  const configBox = document.getElementById('configBox');
-  configBox.classList.toggle('expanded', !configBox.classList.contains('expanded'));
-}
-window.onConfigClick = onConfigClick;
+
+
 
 function onQuarterSelect(vertical, horizontal) {
   //console.log(vertical, horizontal);
@@ -452,15 +530,49 @@ function scanQuarter(vertical, horizontal) {
     
   }, 2200);
 
-
-
-
 }
 window.scanQuarter = scanQuarter;
 
+function logCurrentPreset() {
+console.log(`
+${CURRENT_PRESET.name}
 
+// ISLAND CORE ========================================
+Seeds count: ${CURRENT_PRESET.seedsCount}
+Core Iterations: ${CURRENT_PRESET.coreIterations}
+Core ProbaMin: ${CURRENT_PRESET.coreProbaMin}
+Core ProbaMax: ${CURRENT_PRESET.coreProbaMax}
+// SEEDS EXPANSION ====================================
+// Main land ----------------------
+Mainland Wave Spread: ${CURRENT_PRESET.mainlandWaveSpread}
+Mainland Neighbour Profile: ${CURRENT_PRESET.mainlandNeighbourProfile}
+Mainland Spread: ${CURRENT_PRESET.mainlandSpread}
+Mainland Spread Probability: ${CURRENT_PRESET.mainlandSpreadProbability}
+// Coast --------------------------
+Coast Wave Spread: ${CURRENT_PRESET.coastWaveSpread}
+Coast Neighbour Profile: ${CURRENT_PRESET.coastNeighbourProfile}
+Coast Spread: ${CURRENT_PRESET.coastSpread}
+Coast Spread Probability: ${CURRENT_PRESET.coastSpreadProbability}
+// Beach --------------------------
+Beach Wave Spread: ${CURRENT_PRESET.beachWaveSpread}
+Beach Neighbour Profile: ${CURRENT_PRESET.beachNeighbourProfile}
+Beach Spread: ${CURRENT_PRESET.beachSpread}
+Beach Spread Probability: ${CURRENT_PRESET.beachSpreadProbability}
+// Water 1 ------------------------
+Water1 Wave Spread: ${CURRENT_PRESET.water1WaveSpread}
+Water1 Neighbour Profile: ${CURRENT_PRESET.water1NeighbourProfile}
+Water1 Spread: ${CURRENT_PRESET.water1Spread}
+Water1 Spread Probability: ${CURRENT_PRESET.water1SpreadProbability}
+// Water 2 ------------------------
+Water2 Wave Spread: ${CURRENT_PRESET.water2WaveSpread}
+Water2 Neighbour Profile: ${CURRENT_PRESET.water2NeighbourProfile}
+Water2 Spread: ${CURRENT_PRESET.water2Spread}
+Water2 Spread Probability: ${CURRENT_PRESET.water2SpreadProbability}
+`);
+}
 
 function onGenerateClick() {
+  logCurrentPreset();
   // RESET
   FAILED_QUARTERS = 0;
   let quarters = document.getElementsByClassName('quarter-panel');
@@ -490,9 +602,20 @@ window.onGenerateClick = onGenerateClick;
 
 // FONCTIONS SPECIFIQUE CONFIGURATION
 
+function onConfigClick() {
+  const configBox = document.getElementById('configBox');
+  configBox.classList.toggle('expanded', !configBox.classList.contains('expanded'));
+}
+window.onConfigClick = onConfigClick;
+
+function getKeyFromValue(object, value) {
+  return Object.entries(object)
+    .find(([key, val]) => val === value)?.[0];
+}
+
 function getPresetSelectDom() {
   let str = `
-    <select id="select" class="lzr-select lzr-outlined" onchange="onSelectChange(event)">
+    <select id="select" class="lzr-select lzr-outlined" onchange="onPresetSelectChange(event)">
       <button id=custombutton>
         <selectedcontent></selectedcontent>
       </button>
@@ -504,7 +627,40 @@ function getPresetSelectDom() {
   return str;
 }
 
-function onSelectChange(event) {
+function getNeighbourProfileSelectDom(terrain) {
+  let str = `
+    <select id="${terrain}NeighbourProfileSelect" class="lzr-select lzr-flat" onchange="onNeighbourProfileSelectChange('${terrain}', event)">
+      ${getNeighbourProfileSelectInternalDom(terrain)}
+    </select>`;
+  return str;
+}
+function getNeighbourProfileSelectInternalDom(terrain) {
+  let str = `
+  `;
+  for (let profile of Object.values(NEIGHBOUR_PROFILES)) {
+    let id = getKeyFromValue(NEIGHBOUR_PROFILES, profile);
+    str += `<option value="${id}" ${CURRENT_PRESET[`${terrain}NeighbourProfile`] == id ? 'selected' : ''}>${id}</option>`;
+  }
+  return str;
+}
+
+// Interactions user
+
+function onSwitchClick(event, terrain) {
+  const isChecked = event.srcElement.checked;
+  switch (terrain) {
+    case 'mainland': CURRENT_PRESET.mainlandWaveSpread = isChecked; break;
+    case 'coast': CURRENT_PRESET.coastWaveSpread = isChecked; break;
+    case 'beach': CURRENT_PRESET.beachWaveSpread = isChecked; break;
+    case 'water1': CURRENT_PRESET.water1WaveSpread = isChecked; break;
+    case 'water2': CURRENT_PRESET.water2WaveSpread = isChecked; break;
+  
+    default: break;
+  }
+}
+window.onSwitchClick = onSwitchClick;
+
+function onPresetSelectChange(event) {
   //console.log(event.target.value);
   let preset = PRESETS.find((e) => e.id == event.target.value);
   setPreset(preset);
@@ -514,33 +670,20 @@ function onSelectChange(event) {
   ';`;
   onGenerateClick();
 }
-window.onSelectChange = onSelectChange;
+window.onPresetSelectChange = onPresetSelectChange;
 
-function updateValues() {
-  document.getElementById('centerSpread').innerHTML = CURRENT_PRESET.centerSpread;
-  document.getElementById('surroundingsSpread').innerHTML = CURRENT_PRESET.surroundingsSpread; 
-  document.getElementById('beachSpread').innerHTML = CURRENT_PRESET.beachSpread; 
-  document.getElementById('water1Spread').innerHTML = CURRENT_PRESET.water1Spread; 
-  document.getElementById('water2Spread').innerHTML = CURRENT_PRESET.water2Spread; 
-
-  document.getElementById('centerSpreadProbability').innerHTML = `${CURRENT_PRESET.centerSpreadProbability}%`; 
-  document.getElementById('surroundingsSpreadProbability').innerHTML = `${CURRENT_PRESET.surroundingsSpreadProbability}%`; 
-  document.getElementById('beachSpreadProbability').innerHTML = `${CURRENT_PRESET.beachSpreadProbability}%`; 
-  document.getElementById('water1SpreadProbability').innerHTML = `${CURRENT_PRESET.water1SpreadProbability}%`; 
-  document.getElementById('water2SpreadProbability').innerHTML = `${CURRENT_PRESET.water2SpreadProbability}%`; 
-
-  document.getElementById('seedsCount').innerHTML = CURRENT_PRESET.seedsCount;
-  document.getElementById('coreIterations').innerHTML = CURRENT_PRESET.coreIterations;
-  document.getElementById('coreProbaMin').innerHTML = `${CURRENT_PRESET.coreProbaMin}%`;
-  document.getElementById('coreProbaMax').innerHTML = `${CURRENT_PRESET.coreProbaMax}%`;
+function onNeighbourProfileSelectChange(terrain, event) {
+  CURRENT_PRESET[`${terrain}NeighbourProfile`] = event.target.value;
+  updateValues();
 }
+window.onNeighbourProfileSelectChange = onNeighbourProfileSelectChange;
 
 function onMinusClick(categ, type) {
   switch (type) {
     case 'spread':
       switch (categ) {
-        case 'center': if (CURRENT_PRESET.centerSpread > 1) CURRENT_PRESET.centerSpread -= 1; break;
-        case 'surroundings': if (CURRENT_PRESET.surroundingsSpread > 1) CURRENT_PRESET.surroundingsSpread -= 1; break;
+        case 'mainland': if (CURRENT_PRESET.mainlandSpread > 1) CURRENT_PRESET.mainlandSpread -= 1; break;
+        case 'coast': if (CURRENT_PRESET.coastSpread > 1) CURRENT_PRESET.coastSpread -= 1; break;
         case 'beach': if (CURRENT_PRESET.beachSpread > 1) CURRENT_PRESET.beachSpread -= 1; break;
         case 'water1': if (CURRENT_PRESET.water1Spread > 1) CURRENT_PRESET.water1Spread -= 1; break;
         case 'water2': if (CURRENT_PRESET.water2Spread > 1) CURRENT_PRESET.water2Spread -= 1; break;
@@ -549,8 +692,8 @@ function onMinusClick(categ, type) {
       break;
     case 'proba':
       switch (categ) {
-        case 'center': if (CURRENT_PRESET.centerSpreadProbability > 1) CURRENT_PRESET.centerSpreadProbability -= 1; break;
-        case 'surroundings': if (CURRENT_PRESET.surroundingsSpreadProbability > 1) CURRENT_PRESET.surroundingsSpreadProbability -= 1; break;
+        case 'mainland': if (CURRENT_PRESET.mainlandSpreadProbability > 1) CURRENT_PRESET.mainlandSpreadProbability -= 1; break;
+        case 'coast': if (CURRENT_PRESET.coastSpreadProbability > 1) CURRENT_PRESET.coastSpreadProbability -= 1; break;
         case 'beach': if (CURRENT_PRESET.beachSpreadProbability > 1) CURRENT_PRESET.beachSpreadProbability -= 1; break;
         case 'water1': if (CURRENT_PRESET.water1SpreadProbability > 1) CURRENT_PRESET.water1SpreadProbability -= 1; break;
         case 'water2': if (CURRENT_PRESET.water2SpreadProbability > 1) CURRENT_PRESET.water2SpreadProbability -= 1; break;
@@ -582,8 +725,8 @@ function onPlusClick(categ, type) {
   switch (type) {
     case 'spread':
       switch (categ) {
-        case 'center': CURRENT_PRESET.centerSpread += 1; break;
-        case 'surroundings': CURRENT_PRESET.surroundingsSpread += 1; break;
+        case 'mainland': CURRENT_PRESET.mainlandSpread += 1; break;
+        case 'coast': CURRENT_PRESET.coastSpread += 1; break;
         case 'beach': CURRENT_PRESET.beachSpread += 1; break;
         case 'water1': CURRENT_PRESET.water1Spread += 1; break;
         case 'water2': CURRENT_PRESET.water2Spread += 1; break;
@@ -592,8 +735,8 @@ function onPlusClick(categ, type) {
       break;
     case 'proba':
       switch (categ) {
-        case 'center': if (CURRENT_PRESET.centerSpreadProbability < 99) CURRENT_PRESET.centerSpreadProbability += 1; break;
-        case 'surroundings': if (CURRENT_PRESET.surroundingsSpreadProbability < 99) CURRENT_PRESET.surroundingsSpreadProbability += 1; break;
+        case 'mainland': if (CURRENT_PRESET.mainlandSpreadProbability < 99) CURRENT_PRESET.mainlandSpreadProbability += 1; break;
+        case 'coast': if (CURRENT_PRESET.coastSpreadProbability < 99) CURRENT_PRESET.coastSpreadProbability += 1; break;
         case 'beach': if (CURRENT_PRESET.beachSpreadProbability < 99) CURRENT_PRESET.beachSpreadProbability += 1; break;
         case 'water1': if (CURRENT_PRESET.water1SpreadProbability < 99) CURRENT_PRESET.water1SpreadProbability += 1; break;
         case 'water2': if (CURRENT_PRESET.water2SpreadProbability < 99) CURRENT_PRESET.water2SpreadProbability += 1; break;
@@ -604,13 +747,13 @@ function onPlusClick(categ, type) {
       CURRENT_PRESET.seedsCount += 1;
       break;
     case 'iterations':
-      if (CURRENT_PRESET.coreIterations > 1) CURRENT_PRESET.coreIterations += 1; 
+      CURRENT_PRESET.coreIterations += 1; 
       break;
     case 'probaMin':
-      if (CURRENT_PRESET.coreProbaMin > 1) CURRENT_PRESET.coreProbaMin += 1; 
+      CURRENT_PRESET.coreProbaMin += 1; 
       break;
     case 'probaMax':
-      if (CURRENT_PRESET.coreProbaMax > 1) CURRENT_PRESET.coreProbaMax += 1; 
+      CURRENT_PRESET.coreProbaMax += 1; 
       break;
     default:
       break;
@@ -620,3 +763,35 @@ function onPlusClick(categ, type) {
 }
 window.onPlusClick = onPlusClick;
 
+// Update DOM
+
+function updateValues() {
+  document.getElementById('mainlandWaveSpread').checked = CURRENT_PRESET.mainlandWaveSpread;
+  document.getElementById('coastWaveSpread').checked = CURRENT_PRESET.coastWaveSpread; 
+  document.getElementById('beachWaveSpread').checked = CURRENT_PRESET.beachWaveSpread; 
+  document.getElementById('water1WaveSpread').checked = CURRENT_PRESET.water1WaveSpread; 
+  document.getElementById('water2WaveSpread').checked = CURRENT_PRESET.water2WaveSpread; 
+
+  document.getElementById('mainlandNeighbourProfileSelect').innerHTML = getNeighbourProfileSelectInternalDom('mainland');
+  document.getElementById('coastNeighbourProfileSelect').innerHTML = getNeighbourProfileSelectInternalDom('coast');
+  document.getElementById('beachNeighbourProfileSelect').innerHTML = getNeighbourProfileSelectInternalDom('beach');
+  document.getElementById('water1NeighbourProfileSelect').innerHTML = getNeighbourProfileSelectInternalDom('water1');
+  document.getElementById('water2NeighbourProfileSelect').innerHTML = getNeighbourProfileSelectInternalDom('water2');
+
+  document.getElementById('mainlandSpread').innerHTML = CURRENT_PRESET.mainlandSpread;
+  document.getElementById('coastSpread').innerHTML = CURRENT_PRESET.coastSpread; 
+  document.getElementById('beachSpread').innerHTML = CURRENT_PRESET.beachSpread; 
+  document.getElementById('water1Spread').innerHTML = CURRENT_PRESET.water1Spread; 
+  document.getElementById('water2Spread').innerHTML = CURRENT_PRESET.water2Spread; 
+
+  document.getElementById('mainlandSpreadProbability').innerHTML = `${CURRENT_PRESET.mainlandSpreadProbability}%`; 
+  document.getElementById('coastSpreadProbability').innerHTML = `${CURRENT_PRESET.coastSpreadProbability}%`; 
+  document.getElementById('beachSpreadProbability').innerHTML = `${CURRENT_PRESET.beachSpreadProbability}%`; 
+  document.getElementById('water1SpreadProbability').innerHTML = `${CURRENT_PRESET.water1SpreadProbability}%`; 
+  document.getElementById('water2SpreadProbability').innerHTML = `${CURRENT_PRESET.water2SpreadProbability}%`; 
+
+  document.getElementById('seedsCount').innerHTML = CURRENT_PRESET.seedsCount;
+  document.getElementById('coreIterations').innerHTML = CURRENT_PRESET.coreIterations;
+  document.getElementById('coreProbaMin').innerHTML = `${CURRENT_PRESET.coreProbaMin}%`;
+  document.getElementById('coreProbaMax').innerHTML = `${CURRENT_PRESET.coreProbaMax}%`;
+}
