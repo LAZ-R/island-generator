@@ -34,7 +34,7 @@ export function render() {
 
   // Set MAIN layout
   MAIN.innerHTML = `
-  <div class="top-container">
+  <div class="top-container" style="margin-top: auto;">
     <div class="main-container">
       <div id="mapContainer" class="map-container"></div>
       <div id="mapMask" class="map-mask hidden"></div>
@@ -48,7 +48,7 @@ export function render() {
     </div>
   </div>
 
-  <div class="page-container">
+  <div class="page-container" style="margin-bottom: auto;">
 
     <div class="zoom-pill lzr-margin-bottom">
       <span id="zoom1"   class="zoom-label selected">x1</span>
@@ -63,10 +63,10 @@ export function render() {
 
     <div class="controls-container lzr-margin-bottom">
       <div class="directional-cross-container">
-        <button id="top_left_button" onclick="onQuarterSelect('top', 'left')" class="lzr-button lzr-solid quarter-button">NORTH<br>WEST</button>
-        <button id="top_right_button" onclick="onQuarterSelect('top', 'right')" class="lzr-button lzr-solid quarter-button">NORTH<br>EAST</button>
-        <button id="bottom_left_button" onclick="onQuarterSelect('bottom', 'left')" class="lzr-button lzr-solid quarter-button">SOUTH<br>WEST</button>
-        <button id="bottom_right_button" onclick="onQuarterSelect('bottom', 'right')" class="lzr-button lzr-solid quarter-button">SOUTH<br>EAST</button>
+        <button id="top_left_button" onclick="onQuarterSelect('top', 'left')" class="lzr-button quarter-button">NORTH<br>WEST</button>
+        <button id="top_right_button" onclick="onQuarterSelect('top', 'right')" class="lzr-button quarter-button">NORTH<br>EAST</button>
+        <button id="bottom_left_button" onclick="onQuarterSelect('bottom', 'left')" class="lzr-button quarter-button">SOUTH<br>WEST</button>
+        <button id="bottom_right_button" onclick="onQuarterSelect('bottom', 'right')" class="lzr-button quarter-button">SOUTH<br>EAST</button>
       </div>
       <div class="action-buttons-container">
         <button id="scan_button" onclick="onScanClick()" class="lzr-button">SCAN</button>
@@ -82,6 +82,11 @@ export function render() {
       </div>
 
       <div class="empty-box">
+        <div class="box-button select-button">
+          ${getPresetSelectDom()}
+        </div>
+        <button class="box-button generate-button" onclick="onGenerateClick()">GO</button>
+        
       </div>
       
       <div class="speaker">
@@ -94,10 +99,7 @@ export function render() {
 
       <div id="configBox" class="admin-area">
         <span onclick="onConfigClick()">Scanotron 3000 &copy</span>
-        <div class="top-config-area">
-          ${getPresetSelectDom()}
-          <button class="lzr-button lzr-solid lzr-success" onclick="onGenerateClick()">Generate mission</button>
-        </div>
+        
         <div id="configPanel" class="config-panel" style="margin-top: auto;">
           ${getConfigDom()}
         </div>
@@ -125,7 +127,7 @@ function getConfigDom() {
         <div class="tile-caret">
         ${getSvgIcon('chevron-right', 'm', null)}
         </div>
-        <input type="checkbox">
+        <input type="checkbox" checked>
       </div>
       <div class="expandable-wrapper">
         <div class="expandable-inner">
@@ -406,7 +408,7 @@ function onQuarterSelect(vertical, horizontal) {
 
   let buttons = document.getElementsByClassName('quarter-button');
   for (let button of buttons) {
-    button.classList.toggle('lzr-solid',button.id != `${CURRENT_SELECTED_QUARTER}_button`);
+    button.classList.toggle('selected',button.id == `${CURRENT_SELECTED_QUARTER}_button`);
   }
     
   document.getElementById('scan_button').classList.toggle('lzr-primary', CURRENT_SELECTED_QUARTER != null);
@@ -419,7 +421,7 @@ function resetQuarterSelection() {
   CURRENT_SELECTED_QUARTER = null;
   let buttons = document.getElementsByClassName('quarter-button');
   for (let button of buttons) {
-    button.classList.toggle('lzr-solid',button.id != `${CURRENT_SELECTED_QUARTER}_button`);
+    button.classList.toggle('selected',button.id == `${CURRENT_SELECTED_QUARTER}_button`);
   }
     
   document.getElementById('scan_button').classList.toggle('lzr-primary', CURRENT_SELECTED_QUARTER != null);
@@ -615,7 +617,7 @@ function getKeyFromValue(object, value) {
 
 function getPresetSelectDom() {
   let str = `
-    <select id="select" class="lzr-select lzr-outlined" onchange="onPresetSelectChange(event)">
+    <select id="select" class="" onchange="onPresetSelectChange(event)">
       <button id=custombutton>
         <selectedcontent></selectedcontent>
       </button>

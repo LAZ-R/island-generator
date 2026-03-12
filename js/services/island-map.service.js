@@ -535,6 +535,8 @@ function renderMapFromBounds(bounds) {
           ${CURRENT_ZOOM >= 8 && cell.terrain == 'mainland' ? `<img class="sprite zoom-${CURRENT_ZOOM}" src="${APP_ORIGIN}assets/medias/images/${CURRENT_PRESET.id}-mainland.png" />` : ''}
           ${CURRENT_ZOOM >= 8 && cell.terrain == 'coast' ? `<img class="sprite zoom-${CURRENT_ZOOM}" src="${APP_ORIGIN}assets/medias/images/${CURRENT_PRESET.id}-coast.png" />` : ''}
           ${CURRENT_ZOOM >= 8 && cell.terrain == 'beach' ? `<img class="sprite zoom-${CURRENT_ZOOM}" src="${APP_ORIGIN}assets/medias/images/${CURRENT_PRESET.id}-beach.png" />` : ''}
+
+          ${CURRENT_ZOOM >= 8 && (cell.terrain == null || cell.terrain == 'water1' || cell.terrain == 'water2') ? `<img class="sprite zoom-${CURRENT_ZOOM}" src="${APP_ORIGIN}assets/medias/images/water.gif" />` : ''}
           ${CURRENT_ZOOM == 128 ? `<img class="sprite final" src="${APP_ORIGIN}assets/medias/images/win.png" />` : ''}
         </div>`;
       htmlString += cellHtml;
